@@ -19,3 +19,8 @@ Thumbs.db
 .idea/
 coverage/
 *.tmp.js
+
+.env
+node_modules
+runtime.log
+uploads/*
