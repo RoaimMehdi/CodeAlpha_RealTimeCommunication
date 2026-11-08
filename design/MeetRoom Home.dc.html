@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#fff;font-family:'Manrope',system-ui,sans-serif;color:#10231a;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0E7A4B;text-decoration:none;font-weight:600}
+a:hover{color:#0A5E39;text-decoration:underline}
+</style>
+</helmet>
+<div style="min-height:100vh;padding:12px;background:#fff;display:flex">
+  <div style="flex:1;border-radius:24px;background:#F2F8F4;display:flex;flex-direction:column;padding:20px 28px;gap:24px">
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:10px;background:#0E7A4B;display:grid;place-items:center">
+          <div style="width:16px;height:12px;border-radius:3px;background:#fff"></div>
+        </div>
+        <div style="font-size:20px;font-weight:800;letter-spacing:-0.02em;color:#0A5E39">MeetRoom</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="font-size:13px;font-weight:600;color:#4B5F55">{{ clock }}</div>
+        <div style="width:40px;height:40px;border-radius:50%;background:#0E7A4B;color:#fff;display:grid;place-items:center;font-size:14px;font-weight:800">AK</div>
+      </div>
+    </header>
+
+    <main style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:36px;padding:20px 0">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+        <h1 style="margin:0;font-size:48px;line-height:1.05;font-weight:800;letter-spacing:-0.035em;color:#0A3D27">Ready to meet?</h1>
+        <p style="margin:0;font-size:17px;color:#4B5F55">Start a new room or join one with a code.</p>
+      </div>
+
+      <div style="width:100%;max-width:960px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px">
+        <section style="display:flex;flex-direction:column;justify-content:space-between;gap:28px;padding:36px;border-radius:24px;background:#0E7A4B;color:#fff;min-height:340px;box-shadow:0 16px 40px rgba(10,61,39,0.18)">
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div style="width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.28);display:grid;place-items:center">
+              <div style="position:relative;width:24px;height:17px;border-radius:4px;background:#fff">
+                <div style="position:absolute;right:-8px;top:4px;width:0;height:0;border-top:4.5px solid transparent;border-bottom:4.5px solid transparent;border-right:7px solid #fff"></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <h2 style="margin:0;font-size:30px;font-weight:800;letter-spacing:-0.025em">Start a Room</h2>
+              <p style="margin:0;font-size:15px;line-height:1.5">Open a new room instantly and invite people with a link.</p>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button onClick="{{ toggleCam }}" style="height:40px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.35);background:{{ camBg }};color:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer">{{ camLabel }}</button>
+              <button onClick="{{ toggleMic }}" style="height:40px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.35);background:{{ micBg }};color:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer">{{ micLabel }}</button>
+            </div>
+            <button onClick="{{ start }}" style="height:54px;border:0;border-radius:12px;background:#fff;color:#0A5E39;font:inherit;font-size:16px;font-weight:800;cursor:pointer" style-hover="background:#E6F4EC">{{ startLabel }}</button>
+            <sc-if value="{{ roomCode }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:12px;background:rgba(0,0,0,0.18);font-size:14px">
+                <span>Room <strong style="letter-spacing:0.05em">{{ roomCode }}</strong> is live</span>
+                <button onClick="{{ copy }}" style="height:32px;padding:0 12px;border:0;border-radius:8px;background:rgba(255,255,255,0.2);color:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer">{{ copyLabel }}</button>
+              </div>
+            </sc-if>
+          </div>
+        </section>
+
+        <section style="display:flex;flex-direction:column;justify-content:space-between;gap:28px;padding:36px;border-radius:24px;background:#fff;min-height:340px;box-shadow:0 1px 2px rgba(10,61,39,0.06),0 12px 32px rgba(10,61,39,0.08)">
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div style="width:56px;height:56px;border-radius:16px;background:#E6F4EC;display:grid;place-items:center">
+              <div style="display:grid;grid-template-columns:repeat(2,10px);gap:4px">
+                <div style="width:10px;height:10px;border-radius:3px;background:#0E7A4B"></div>
+                <div style="width:10px;height:10px;border-radius:3px;background:#0E7A4B"></div>
+                <div style="width:10px;height:10px;border-radius:3px;background:#0E7A4B"></div>
+                <div style="width:10px;height:10px;border-radius:3px;background:#7FBF9C"></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <h2 style="margin:0;font-size:30px;font-weight:800;letter-spacing:-0.025em;color:#0A3D27">Join a Room</h2>
+              <p style="margin:0;font-size:15px;line-height:1.5;color:#4B5F55">Enter the room code or link from your invite.</p>
+            </div>
+          </div>
+          <form onSubmit="{{ join }}" noValidate="{{ true }}" style="display:flex;flex-direction:column;gap:12px">
+            <input value="{{ code }}" onChange="{{ onCode }}" placeholder="Room code, e.g. 123 456 7890" style="height:54px;padding:0 16px;border:1.5px solid {{ codeBorder }};border-radius:12px;font:inherit;font-size:16px;letter-spacing:0.03em;color:#10231a;outline:none;background:#fff" style-focus="border-color:#0E7A4B;box-shadow:0 0 0 4px rgba(14,122,75,0.15)"></input>
+            <sc-if value="{{ codeError }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size:13px;color:#B42318;font-weight:600">{{ codeError }}</span>
+            </sc-if>
+            <button type="submit" style="height:54px;border:0;border-radius:12px;background:#0E7A4B;color:#fff;font:inherit;font-size:16px;font-weight:800;cursor:pointer" style-hover="background:#0A5E39">{{ joinLabel }}</button>
+          </form>
+        </section>
+      </div>
+    </main>
+
+    <footer style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px;color:#4B5F55">
+      <span>© 2026 MeetRoom</span>
+      <div style="display:flex;gap:18px">
+        <a href="MeetRoom Login v2.dc.html" style="color:#4B5F55;font-weight:600">Sign out</a>
+        <a href="#help" style="color:#4B5F55;font-weight:600">Help</a>
+      </div>
+    </footer>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { cam: true, mic: true, roomCode: '', copied: false, code: '', codeError: '', joining: false, starting: false, now: new Date() };
+  componentDidMount() { this.iv = setInterval(() => this.setState({ now: new Date() }), 30000); }
+  componentWillUnmount() { clearInterval(this.iv); clearTimeout(this.t); }
+  renderVals() {
+    const s = this.state;
+    const clock = s.now.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) + ' · ' + s.now.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+    return {
+      clock,
+      camLabel: s.cam ? 'Video on' : 'Video off', micLabel: s.mic ? 'Mic on' : 'Mic off',
+      camBg: s.cam ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.22)', micBg: s.mic ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.22)',
+      toggleCam: () => this.setState({ cam: !s.cam }), toggleMic: () => this.setState({ mic: !s.mic }),
+      startLabel: s.starting ? 'Starting…' : (s.roomCode ? 'Start another room' : 'Start now'),
+      start: () => {
+        this.setState({ starting: true, copied: false });
+        clearTimeout(this.t);
+        this.t = setTimeout(() => {
+          const n = () => Math.floor(100 + Math.random() * 900);
+          const code = n() + ' ' + n() + ' ' + n();
+          this.setState({ starting: false, roomCode: code });
+          this.t = setTimeout(() => { location.href = 'MeetRoom%20Call.dc.html?mode=start&room=' + encodeURIComponent(code) + '&cam=' + (s.cam ? 1 : 0) + '&mic=' + (s.mic ? 1 : 0); }, 600);
+        }, 700);
+      },
+      roomCode: s.roomCode,
+      copyLabel: s.copied ? 'Copied' : 'Copy link',
+      copy: () => { try { navigator.clipboard.writeText('https://meetroom.app/r/' + s.roomCode.replace(/ /g, '')); } catch (e) {} this.setState({ copied: true }); },
+      code: s.code,
+      onCode: e => this.setState({ code: e.target.value, codeError: '', joining: false }),
+      codeError: s.codeError,
+      codeBorder: s.codeError ? '#B42318' : '#DCE6E0',
+      joinLabel: s.joining ? 'Joining…' : 'Join room',
+      join: e => {
+        e.preventDefault();
+        const d = s.code.replace(/\D/g, '');
+        if (d.length < 9 && !/^https?:\/\//.test(s.code)) return this.setState({ codeError: 'Room codes are 9–11 digits.' });
+        this.setState({ joining: true });
+        clearTimeout(this.t);
+        this.t = setTimeout(() => { location.href = 'MeetRoom%20Call.dc.html?mode=join&room=' + encodeURIComponent(s.code.trim()) + '&cam=' + (s.cam ? 1 : 0) + '&mic=' + (s.mic ? 1 : 0); }, 700);
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

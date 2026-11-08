@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CamKnock — Video Meetings, Whiteboard & Screen Sharing</title>
+  <link rel="icon" href="/assets/camknock-icon.png" type="image/png">
+  <meta name="theme-color" content="#0E7A4B">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    html { scroll-behavior: smooth; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #F8FCFA;
+      font-family: 'Manrope', system-ui, sans-serif;
+      color: #10231a;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    * { box-sizing: border-box; }
+    a { color: #0E7A4B; text-decoration: none; font-weight: 600; transition: color 0.15s; }
+    a:hover { color: #0A5E39; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+    @keyframes soundWave {
+      0%, 100% { height: 6px; }
+      50% { height: 18px; }
+    }
+
+    .anim-fade-up { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .anim-delay-1 { animation-delay: 0.1s; }
+    .anim-delay-2 { animation-delay: 0.2s; }
+    .anim-delay-3 { animation-delay: 0.3s; }
+
+    /* Top Announcement Bar */
+    .top-banner {
+      background: #0A1B13;
+      color: #CFE3D7;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 9px 16px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .top-banner a {
+      color: #4ADE80;
+      font-weight: 700;
+      text-decoration: underline;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #E1ECE5;
+      transition: all 0.2s;
+    }
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      height: 70px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .nav-logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      flex: none;
+      overflow: hidden;
+      display: block;
+      box-shadow: 0 4px 14px rgba(14, 122, 75, 0.22);
+    }
+    .nav-logo-text {
+      font-size: 21px;
+      font-weight: 800;
+      color: #0A3D27;
+      letter-spacing: -0.4px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .nav-link {
+      font-size: 14px;
+      font-weight: 700;
+      color: #375345;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .nav-link:hover { color: #0E7A4B; }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-nav-outline {
+      height: 40px;
+      padding: 0 16px;
+      border: 1.5px solid #CFE3D7;
+      border-radius: 999px;
+      background: #fff;
+      color: #0A5E39;
+      font-size: 13px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-nav-outline:hover {
+      background: #EAF5EE;
+      border-color: #0E7A4B;
+    }
+    .btn-nav-primary {
+      height: 40px;
+      padding: 0 20px;
+      border: 0;
+      border-radius: 999px;
+      background: #0E7A4B;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(14, 122, 75, 0.3);
+      transition: background 0.15s, transform 0.15s;
+    }
+    .btn-nav-primary:hover {
+      background: #0A5E39;
+      transform: translateY(-1px);
+    }
+
+    /* Hero Section */
+    .hero-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 24px 50px;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: center;
+      gap: 48px;
+    }
+    @media (max-width: 960px) {
+      .hero-section {
+        grid-template-columns: 1fr;
+        padding: 40px 20px;
+        gap: 40px;
+      }
+      .nav-links { display: none; }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 32px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: #E6F4EC;
+      color: #0A5E39;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #16A34A;
+      animation: pulseDot 2s infinite ease-in-out;
+    }
+    .hero-title {
+      font-size: clamp(34px, 4.5vw, 54px);
+      font-weight: 800;
+      line-height: 1.12;
+      color: #0A2E1D;
+      letter-spacing: -0.03em;
+      margin: 0 0 18px;
+    }
+    .hero-title span {
+      background: linear-gradient(135deg, #0E7A4B 0%, #059669 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-sub {
+      font-size: 18px;
+      line-height: 1.6;
+      color: #435B4E;
+      margin: 0 0 32px;
+      max-width: 580px;
+    }
+
+    /* Quick Join Bar on Hero */
+    .hero-join-box {
+      background: #fff;
+      border: 2px solid #D1E5DA;
+      border-radius: 18px;
+      padding: 8px 8px 8px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 12px 36px rgba(10, 61, 39, 0.08);
+      max-width: 540px;
+      margin-bottom: 24px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .hero-join-box:focus-within {
+      border-color: #0E7A4B;
+      box-shadow: 0 12px 36px rgba(14, 122, 75, 0.16);
+    }
+    .hero-join-input {
+      flex: 1;
+      border: 0;
+      outline: none;
+      font-size: 16px;
+      font-weight: 700;
+      color: #10231a;
+      letter-spacing: 0.02em;
+    }
+    .hero-join-input::placeholder {
+      font-weight: 500;
+      color: #8BA89B;
+    }
+    .hero-join-btn {
+      height: 48px;
+      padding: 0 24px;
+      border: 0;
+      border-radius: 12px;
+      background: #0E7A4B;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .hero-join-btn:hover {
+      background: #0A5E39;
+      transform: translateY(-1px);
+    }
+
+    .hero-features-list {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      font-weight: 700;
+      color: #4B5F55;
+    }
+    .hero-feat-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Live Meeting Mockup Card */
+    /* Live Meeting Mockup Card - Redesigned & Balanced */
+    .mockup-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .mockup-card {
+      background: #09130D;
+      border: 1px solid rgba(74, 222, 128, 0.2);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(7, 32, 15, 0.35), 0 0 0 1px rgba(255,255,255,0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .mockup-card:hover {
+      box-shadow: 0 32px 70px rgba(14, 122, 75, 0.28), 0 0 0 1px rgba(74, 222, 128, 0.3);
+    }
+    .mockup-header {
+      height: 44px;
+      background: #0E1A13;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .mockup-dots {
+      display: flex;
+      gap: 7px;
+    }
+    .mockup-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .mockup-title-bar {
+      font-size: 12px;
+      font-weight: 700;
+      color: #9EC0AD;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .mockup-pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22C55E;
+      box-shadow: 0 0 8px #22C55E;
+      animation: pulseGreen 2s infinite;
+    }
+    .mockup-sec-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.12);
+      color: #4ADE80;
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .mockup-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mockup-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      height: 230px;
+    }
+    .mockup-tile {
+      background: #121F17;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s;
+    }
+    .mockup-tile.speaking {
+      border: 1.5px solid #22C55E;
+      box-shadow: inset 0 0 20px rgba(34, 197, 94, 0.15);
+    }
+    .mockup-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    .mockup-label {
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      height: 26px;
+      padding: 0 10px;
+      border-radius: 8px;
+      background: rgba(7, 18, 12, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .mockup-quality-tag {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 10px;
+      font-weight: 800;
+      color: #4ADE80;
+      background: rgba(14, 122, 75, 0.3);
+      padding: 2px 7px;
+      border-radius: 6px;
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      letter-spacing: 0.05em;
+    }
+    .sound-bars {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      height: 12px;
+    }
+    .sound-bar {
+      width: 2.5px;
+      background: #4ADE80;
+      border-radius: 2px;
+      animation: soundWave 0.8s ease-in-out infinite;
+    }
+    .mockup-controls {
+      height: 52px;
+      background: #0E1A13;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 0 16px;
+    }
+    .mockup-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #17261D;
+      border: 1px solid rgba(255,255,255,0.06);
+      display: grid;
+      place-items: center;
+      color: #CFE3D7;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .mockup-btn.red { background: #DC2626; color: #fff; border-color: #EF4444; }
+    .mockup-btn.green { background: #0E7A4B; color: #fff; border-color: #10B981; }
+
+    /* Aligned Proof Bar under Mockup (Clean, professional, not floating clipart stickers) */
+    .mockup-feature-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 500px) {
+      .mockup-feature-bar { grid-template-columns: 1fr; }
+    }
+    .mockup-pill-item {
+      background: #fff;
+      border: 1px solid #D7E7DE;
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 14px rgba(10, 61, 39, 0.05);
+    }
+    .mockup-pill-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: #E8F5EE;
+      color: #0E7A4B;
+      display: grid;
+      place-items: center;
+      flex: none;
+    }
+    .mockup-pill-text {
+      font-size: 12px;
+      font-weight: 800;
+      color: #0A3D27;
+      line-height: 1.25;
+    }
+    .mockup-pill-sub {
+      font-size: 11px;
+      font-weight: 500;
+      color: #617A6D;
+      margin-top: 1px;
+    }
+
+    /* Embedded Auth / Meeting Section */
+    .auth-section {
+      background: #fff;
+      border-top: 1px solid #E1ECE5;
+      border-bottom: 1px solid #E1ECE5;
+      padding: 72px 24px;
+    }
+    .auth-container {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 56px;
+      align-items: center;
+    }
+    @media (max-width: 880px) {
+      .auth-container { grid-template-columns: 1fr; gap: 40px; }
+    }
+
+    .auth-card-box {
+      background: #F8FCFA;
+      border: 1.5px solid #DCE6E0;
+      border-radius: 24px;
+      padding: 36px 32px;
+      box-shadow: 0 16px 40px rgba(10, 61, 39, 0.06);
+    }
+    .tab-pills {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      padding: 4px;
+      background: #EEF5F1;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+    .tab-pill-btn {
+      height: 40px;
+      border: 0;
+      border-radius: 9px;
+      font-size: 14px;
+      font-weight: 700;
+      background: transparent;
+      color: #4B5F55;
+      transition: all 0.15s;
+    }
+    .tab-pill-btn.active {
+      background: #fff;
+      color: #0A5E39;
+      box-shadow: 0 2px 6px rgba(10, 61, 39, 0.12);
+    }
+
+    .input-field {
+      width: 100%;
+      height: 48px;
+      padding: 0 14px;
+      border: 1.5px solid #DCE6E0;
+      border-radius: 10px;
+      font-size: 15px;
+      color: #10231a;
+      outline: none;
+      background: #fff;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .input-field:focus {
+      border-color: #0E7A4B !important;
+      box-shadow: 0 0 0 4px rgba(14, 122, 75, 0.15) !important;
+    }
+    .input-field.has-error { border-color: #B42318 !important; }
+    .err-text {
+      color: #B42318;
+      font-size: 12px;
+      font-weight: 600;
+      min-height: 16px;
+      display: block;
+    }
+
+    .btn-submit {
+      height: 50px;
+      border: 0;
+      border-radius: 10px;
+      background: #0E7A4B;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+    .btn-submit:hover:not(:disabled) {
+      background: #0A5E39;
+      transform: translateY(-1px);
+    }
+    .btn-sso {
+      height: 42px;
+      border: 1.5px solid #DCE6E0;
+      border-radius: 10px;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      color: #10231a;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .btn-sso:hover {
+      background: #F2F8F4;
+      border-color: #0E7A4B;
+    }
+
+    .spin {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hidden { display: none !important; }
+
+    /* Features Grid (Zoom Style) */
+    .features-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 88px 24px;
+    }
+    .section-header {
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto 56px;
+    }
+    .section-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 28px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: #E6F4EC;
+      color: #0A5E39;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: clamp(28px, 3.8vw, 42px);
+      font-weight: 800;
+      color: #0A2E1D;
+      line-height: 1.2;
+      margin: 0 0 14px;
+    }
+    .section-sub {
+      font-size: 16px;
+      line-height: 1.65;
+      color: #4B5F55;
+      margin: 0;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+    }
+    .feat-card {
+      background: #fff;
+      border: 1.5px solid #E1ECE5;
+      border-radius: 20px;
+      padding: 32px 28px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .feat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 36px rgba(14, 122, 75, 0.08);
+      border-color: #0E7A4B;
+    }
+    .feat-icon-wrap {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: #EAF5EE;
+      color: #0E7A4B;
+      display: grid;
+      place-items: center;
+      margin-bottom: 20px;
+    }
+    .feat-card h3 {
+      font-size: 19px;
+      font-weight: 800;
+      color: #0A3D27;
+      margin: 0 0 10px;
+    }
+    .feat-card p {
+      font-size: 15px;
+      line-height: 1.65;
+      color: #4B5F55;
+      margin: 0;
+    }
+
+    /* Comparison Section - Redesigned & Modern SaaS Grade */
+    .compare-section {
+      background: #061A0E;
+      color: #fff;
+      padding: 96px 24px;
+      position: relative;
+      border-top: 1px solid rgba(74, 222, 128, 0.15);
+      border-bottom: 1px solid rgba(74, 222, 128, 0.15);
+    }
+    .compare-container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin-top: 48px;
+    }
+    @media (max-width: 768px) {
+      .compare-grid { grid-template-columns: 1fr; }
+    }
+    .compare-card {
+      border-radius: 20px;
+      padding: 36px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .compare-card.old {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+    .compare-card.camknock {
+      background: linear-gradient(145deg, rgba(14, 122, 75, 0.3) 0%, rgba(6, 42, 25, 0.6) 100%);
+      border: 1.5px solid rgba(74, 222, 128, 0.45);
+      box-shadow: 0 24px 60px rgba(10, 61, 39, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      position: relative;
+    }
+    .compare-card-head {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .compare-card-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+      width: fit-content;
+    }
+    .compare-card.old .compare-card-badge {
+      background: rgba(239, 68, 68, 0.12);
+      color: #F87171;
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+    .compare-card.camknock .compare-card-badge {
+      background: rgba(34, 197, 94, 0.18);
+      color: #4ADE80;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+    }
+    .compare-card h3 {
+      font-size: 24px;
+      font-weight: 800;
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+    .compare-card-sub {
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 0;
+    }
+    .compare-card.old .compare-card-sub { color: #8CA395; }
+    .compare-card.camknock .compare-card-sub { color: #A7D4BA; }
+    .compare-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .compare-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .compare-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex: none;
+      margin-top: 2px;
+    }
+    .compare-icon.red {
+      background: rgba(239, 68, 68, 0.18);
+      color: #EF4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .compare-icon.green {
+      background: rgba(34, 197, 94, 0.2);
+      color: #4ADE80;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+    }
+    .compare-text {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .compare-item-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .compare-card.old .compare-item-title { color: #D1DFD7; }
+    .compare-item-desc {
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .compare-card.old .compare-item-desc { color: #7B9386; }
+    .compare-card.camknock .compare-item-desc { color: #A0CDB5; }
+
+    /* How It Works (3 Steps) */
+    .how-section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 88px 24px;
+    }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+    }
+    .step-card {
+      text-align: center;
+      padding: 24px;
+    }
+    .step-number {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #0E7A4B;
+      color: #fff;
+      font-size: 22px;
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 20px;
+      box-shadow: 0 8px 24px rgba(14, 122, 75, 0.25);
+    }
+    .step-card h3 {
+      font-size: 19px;
+      font-weight: 800;
+      color: #0A3D27;
+      margin: 0 0 10px;
+    }
+    .step-card p {
+      font-size: 15px;
+      color: #4B5F55;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* CTA Section */
+    .cta-section {
+      max-width: 1100px;
+      margin: 0 auto 72px;
+      padding: 0 24px;
+    }
+    .cta-box {
+      background: linear-gradient(135deg, #0E7A4B 0%, #0A5E39 100%);
+      border-radius: 28px;
+      padding: 64px 40px;
+      text-align: center;
+      color: #fff;
+      box-shadow: 0 24px 60px rgba(14, 122, 75, 0.25);
+    }
+    .cta-box h2 {
+      font-size: clamp(30px, 4.2vw, 46px);
+      font-weight: 800;
+      margin: 0 0 16px;
+      line-height: 1.15;
+    }
+    .cta-box p {
+      font-size: 17px;
+      color: rgba(255,255,255,0.85);
+      max-width: 520px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+    .cta-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .btn-cta-white {
+      height: 52px;
+      padding: 0 32px;
+      border-radius: 999px;
+      border: 0;
+      background: #fff;
+      color: #0A5E39;
+      font-size: 15px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-cta-white:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+      color: #0A3D27;
+    }
+    .btn-cta-trans {
+      height: 52px;
+      padding: 0 28px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,0.4);
+      background: transparent;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-cta-trans:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: #fff;
+    }
+
+    /* Footer */
+    footer {
+      background: #07200F;
+      padding: 72px 24px 0;
+    }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 56px;
+    }
+    @media (max-width: 900px) {
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 36px; }
+    }
+    @media (max-width: 540px) {
+      .footer-top { grid-template-columns: 1fr; gap: 28px; }
+    }
+    .footer-brand { display: flex; flex-direction: column; gap: 18px; }
+    .footer-brand-desc {
+      font-size: 14px;
+      color: #7FA88F;
+      line-height: 1.65;
+      max-width: 280px;
+    }
+    .footer-social {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .footer-social a {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      display: grid; place-items: center;
+      color: #7FA88F;
+      text-decoration: none;
+      transition: background 0.18s, color 0.18s, border-color 0.18s;
+    }
+    .footer-social a:hover {
+      background: #0E7A4B;
+      color: #fff;
+      border-color: #0E7A4B;
+    }
+    .footer-col { display: flex; flex-direction: column; gap: 14px; }
+    .footer-col-title {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #4A7A5C;
+      margin-bottom: 4px;
+    }
+    .footer-col a {
+      font-size: 14px;
+      font-weight: 500;
+      color: #A8C4B2;
+      text-decoration: none;
+      transition: color 0.15s;
+      line-height: 1;
+    }
+    .footer-col a:hover { color: #fff; }
+    .footer-contact-email {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #4ADE80;
+      text-decoration: none;
+      margin-top: 4px;
+      transition: color 0.15s;
+    }
+    .footer-contact-email:hover { color: #86efac; }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.07);
+      padding: 22px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .footer-copy {
+      font-size: 13px;
+      color: #4A7A5C;
+      font-weight: 500;
+    }
+    .footer-badges {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .footer-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #4A7A5C;
+      padding: 5px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .footer-badge span { width:6px;height:6px;border-radius:50%;background:#4ADE80;display:block; }
+  </style>
+</head>
+<body>
+
+<!-- Announcement Bar -->
+<div class="top-banner">
+  <span style="display:inline-flex;align-items:center;gap:8px">
+    <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#4ADE80;box-shadow:0 0 8px #4ADE80;animation:pulseGreen 1.8s infinite"></span>
+    Introducing CamKnock 2.0: Instant WebRTC video calls, live screen sharing, and multiplayer whiteboard.
+  </span>
+  <a href="#join">Try it now &rarr;</a>
+</div>
+
+<!-- Main Navigation -->
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-logo">
+      <img src="/assets/camknock-icon.png" alt="CamKnock" width="40" height="40" class="nav-logo-icon">
+      <span class="nav-logo-text">Cam<span style="color:#0E7A4B">Knock</span></span>
+    </a>
+
+    <div class="nav-links">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#whiteboard" class="nav-link">Whiteboard</a>
+      <a href="#how" class="nav-link">How it works</a>
+      <a href="/help" class="nav-link">Help Center</a>
+    </div>
+
+    <div class="nav-actions">
+      <button type="button" class="btn-nav-outline" onclick="switchToJoin()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Join Meeting
+      </button>
+      <a href="/signin" class="btn-nav-outline">
+        Sign In
+      </a>
+      <a href="/signup" class="btn-nav-primary">
+        Sign Up Free &rarr;
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-content anim-fade-up">
+    <div class="hero-badge">
+      <span class="pulse-dot"></span>
+      <span>No app download required • 100% in browser</span>
+    </div>
+
+    <h1 class="hero-title">
+      Where conversations meet <span>collaboration.</span>
+    </h1>
+
+    <p class="hero-sub">
+      Connect, screen share, and brainstorm with multiplayer whiteboards in one click. CamKnock gives your team instant, encrypted video meetings without friction.
+    </p>
+
+    <!-- Hero Direct Quick Join Bar -->
+    <div class="hero-join-box" id="join">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0E7A4B" stroke-width="2.2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      <input type="text" id="heroCodeInput" class="hero-join-input" placeholder="Enter meeting code or paste link (e.g. 8b4c2e)" onkeydown="if(event.key==='Enter')handleHeroJoin()">
+      <button type="button" id="heroJoinBtn" class="hero-join-btn" onclick="handleHeroJoin()">
+        Join
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+
+    <div class="hero-features-list">
+      <span class="hero-feat-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Instant guest access
+      </span>
+      <span class="hero-feat-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Multiplayer whiteboard
+      </span>
+      <span class="hero-feat-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        End-to-end encrypted
+      </span>
+    </div>
+  </div>
+
+  <!-- Hero Visual / Live Meeting Mockup Showcase -->
+  <div class="mockup-wrapper anim-fade-up anim-delay-1">
+    <div class="mockup-card">
+      <div class="mockup-header">
+        <div class="mockup-dots">
+          <div class="mockup-dot" style="background:#EF4444"></div>
+          <div class="mockup-dot" style="background:#F59E0B"></div>
+          <div class="mockup-dot" style="background:#10B981"></div>
+        </div>
+        <div class="mockup-title-bar">
+          <span class="mockup-pulse-dot"></span>
+          <span>Room #8b4c2e • 24:18 Live</span>
+        </div>
+        <div class="mockup-sec-badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          E2E Encrypted
+        </div>
+      </div>
+
+      <div class="mockup-body">
+        <div class="mockup-grid">
+          <!-- Tile 1: Speaking Host -->
+          <div class="mockup-tile speaking">
+            <span class="mockup-quality-tag">1080p HD</span>
+            <div class="mockup-avatar" style="background:linear-gradient(135deg, #10B981 0%, #047857 100%);color:#fff">AK</div>
+            <div class="mockup-label">
+              <div class="sound-bars">
+                <span class="sound-bar" style="animation-delay:0.1s"></span>
+                <span class="sound-bar" style="animation-delay:0.35s"></span>
+                <span class="sound-bar" style="animation-delay:0.2s"></span>
+                <span class="sound-bar" style="animation-delay:0.45s"></span>
+              </div>
+              <span>Alex (Host)</span>
+            </div>
+          </div>
+          <!-- Tile 2: Participant -->
+          <div class="mockup-tile">
+            <span class="mockup-quality-tag" style="background:rgba(59,130,246,0.25);color:#60A5FA;border-color:rgba(96,165,250,0.3)">60 FPS</span>
+            <div class="mockup-avatar" style="background:linear-gradient(135deg, #38BDF8 0%, #0284C7 100%);color:#fff">SM</div>
+            <div class="mockup-label">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.2" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+              <span>Sarah Miller</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- In-Call Control Dock -->
+        <div class="mockup-controls">
+          <div class="mockup-btn green" title="Microphone Active">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+          </div>
+          <div class="mockup-btn green" title="Camera Active">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          </div>
+          <div class="mockup-btn green" title="Instant Screen Sharing Active">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <div class="mockup-btn green" title="Collaborative Whiteboard Active">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/></svg>
+          </div>
+          <div class="mockup-btn red" title="Leave Meeting">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"/><line x1="23" y1="1" x2="1" y2="23"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clean, Aligned Proof Bar (Replaces tacky floating stickers) -->
+    <div class="mockup-feature-bar">
+      <div class="mockup-pill-item">
+        <div class="mockup-pill-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div>
+          <div class="mockup-pill-text">60 FPS Screen Share</div>
+          <div class="mockup-pill-sub">Zero-lag WebRTC peer stream</div>
+        </div>
+      </div>
+      <div class="mockup-pill-item">
+        <div class="mockup-pill-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
+        </div>
+        <div>
+          <div class="mockup-pill-text">Live Whiteboard</div>
+          <div class="mockup-pill-sub">Multiplayer drawing &amp; export</div>
+        </div>
+      </div>
+      <div class="mockup-pill-item">
+        <div class="mockup-pill-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div>
+          <div class="mockup-pill-text">DTLS-SRTP Security</div>
+          <div class="mockup-pill-sub">Direct peer-to-peer cipher</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Fast & Seamless Access / Join Meeting Section -->
+<section class="auth-section" id="auth-hub">
+  <div class="auth-container">
+    <div>
+      <div class="section-badge">Fast &amp; Seamless Access</div>
+      <h2 style="font-size:36px;font-weight:800;color:#0A2E1D;margin:0 0 16px;line-height:1.2">
+        Join any meeting directly from your browser.
+      </h2>
+      <p style="font-size:16px;color:#4B5F55;line-height:1.7;margin:0 0 28px">
+        No downloads, installations, or account creation needed. Simply paste your invite link or enter the 6-character room code to jump straight into the call.
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div style="display:flex;align-items:flex-start;gap:14px">
+          <div style="width:36px;height:36px;border-radius:10px;background:#E6F4EC;color:#0A5E39;display:grid;place-items:center;flex:none;font-weight:800">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </div>
+          <div>
+            <strong style="color:#0A3D27;font-size:16px">Paste Link or Enter Code</strong>
+            <p style="margin:3px 0 0;font-size:14px;color:#4B5F55;line-height:1.5">Accepts full meeting URLs (e.g. <code>/r/8b4c2e</code>) or raw room codes.</p>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:flex-start;gap:14px">
+          <div style="width:36px;height:36px;border-radius:10px;background:#E6F4EC;color:#0A5E39;display:grid;place-items:center;flex:none;font-weight:800">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <strong style="color:#0A3D27;font-size:16px">Instant Guest Access</strong>
+            <p style="margin:3px 0 0;font-size:14px;color:#4B5F55;line-height:1.5">No login required for attendees. Enter your display name and join in 2 seconds.</p>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:flex-start;gap:14px">
+          <div style="width:36px;height:36px;border-radius:10px;background:#E6F4EC;color:#0A5E39;display:grid;place-items:center;flex:none;font-weight:800">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <strong style="color:#0A3D27;font-size:16px">Encrypted &amp; Private</strong>
+            <p style="margin:3px 0 0;font-size:14px;color:#4B5F55;line-height:1.5">All video, audio, and whiteboard data are encrypted peer-to-peer.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Join a Meeting Dedicated Card -->
+    <div class="auth-card-box" style="background:#fff;border:1.5px solid #D1E5DA;box-shadow:0 18px 48px rgba(10,61,39,0.08);padding:38px 34px">
+      <div id="joinSection">
+        <form id="joinMeetingForm" novalidate style="display:flex;flex-direction:column;gap:18px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <h3 style="margin:0;font-size:24px;font-weight:800;color:#0A2E1D">Join a Meeting</h3>
+              <p style="margin:4px 0 0;font-size:14px;color:#4B5F55">Enter your invite link or 6-character room code.</p>
+            </div>
+            <div style="width:40px;height:40px;border-radius:12px;background:#E8F5EE;color:#0E7A4B;display:grid;place-items:center;flex:none">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            </div>
+          </div>
+
+          <label style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:13px;font-weight:700;color:#10231a">Meeting ID or Invite Link</span>
+            <div style="position:relative">
+              <input id="quickCode" class="input-field" placeholder="e.g. 8b4c2e or https://camknock/r/8b4c2e" style="font-size:15px;font-weight:700;padding-left:42px;letter-spacing:0.02em">
+              <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#0E7A4B" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            </div>
+            <span id="quickCodeErr" class="err-text"></span>
+          </label>
+
+          <label style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:13px;font-weight:700;color:#10231a">Your Display Name</span>
+            <div style="position:relative">
+              <input id="quickName" class="input-field" placeholder="How others will see you in the call" style="padding-left:42px">
+              <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#0E7A4B" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <span id="quickNameErr" class="err-text"></span>
+          </label>
+
+          <div style="display:flex;flex-direction:column;gap:10px;padding:14px 16px;border-radius:14px;background:#F2F8F4;border:1px solid #DCE6E0">
+            <span style="font-size:12px;font-weight:800;color:#0A3D27;text-transform:uppercase;letter-spacing:0.06em">Pre-Join Media Options</span>
+            <label style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;cursor:pointer;color:#2D4A3E">
+              <input type="checkbox" id="quickCamOff" style="width:16px;height:16px;accent-color:#0E7A4B">
+              <span>Join with camera turned off</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;cursor:pointer;color:#2D4A3E">
+              <input type="checkbox" id="quickMicOff" style="width:16px;height:16px;accent-color:#0E7A4B">
+              <span>Join with microphone muted</span>
+            </label>
+          </div>
+
+          <button id="quickJoinBtn" type="submit" class="btn-submit" style="height:52px;font-size:16px">
+            <span id="quickJoinSpinner" class="spin hidden"></span>
+            <span id="quickJoinLabel">Join Meeting Now &rarr;</span>
+          </button>
+
+          <div id="quickJoinOk" class="hidden" style="padding:12px 14px;border-radius:10px;background:#E6F4EC;color:#0A5E39;font-size:14px;font-weight:700;text-align:center">
+            Connecting you to meeting…
+          </div>
+
+          <p style="margin:4px 0 0;font-size:14px;color:#4B5F55;text-align:center">
+            Hosting? <a href="/signin" style="font-weight:700">Sign in to host a room</a> &bull; <a href="/signup" style="font-weight:700">Create free account</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Grid (Zoom & Meet style) -->
+<section class="features-section" id="features">
+  <div class="section-header">
+    <div class="section-badge">Everything you need</div>
+    <h2 class="section-title">Built for high-performance team meetings</h2>
+    <p class="section-sub">CamKnock pairs modern WebRTC low-latency streaming with multiplayer visual tools for richer remote conversations.</p>
+  </div>
+
+  <div class="features-grid">
+    <!-- Card 1 -->
+    <div class="feat-card">
+      <div class="feat-icon-wrap">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+      </div>
+      <h3>Crystal-Clear HD Video</h3>
+      <p>Peer-to-peer WebRTC mesh network with intelligent bitrate adaptivity and automatic speaker detection.</p>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="feat-card" id="screenshare">
+      <div class="feat-icon-wrap">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </div>
+      <h3>1-Click Screen Sharing</h3>
+      <p>Share your full desktop, application window, or browser tab with full fidelity for code reviews and slide decks.</p>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="feat-card" id="whiteboard">
+      <div class="feat-icon-wrap">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/></svg>
+      </div>
+      <h3>Multiplayer Whiteboard</h3>
+      <p>Brainstorm, draw diagrams, sketch system architectures, and export high-res PNGs in real-time with team members.</p>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="feat-card">
+      <div class="feat-icon-wrap">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </div>
+      <h3>Chat &amp; 25MB File Transfers</h3>
+      <p>Share notes, code blocks, and large files up to 25MB directly inside the call without relying on external cloud storage.</p>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="feat-card" id="security">
+      <div class="feat-icon-wrap">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h3>End-to-End Encryption</h3>
+      <p>All video and audio streams are encrypted peer-to-peer using DTLS-SRTP, keeping your meetings completely confidential.</p>
+    </div>
+
+    <!-- Card 6 -->
+    <div class="feat-card">
+      <div class="feat-icon-wrap">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <h3>No Downloads Required</h3>
+      <p>Works natively in Google Chrome, Microsoft Edge, Mozilla Firefox, and Safari on Mac, Windows, Linux, and iOS.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Comparison Section: CamKnock vs Traditional Apps -->
+<section class="compare-section">
+  <div class="compare-container">
+    <div class="section-header" style="margin-bottom:24px;text-align:center">
+      <div class="section-badge" style="background:rgba(34,197,94,0.15);color:#4ADE80;border:1px solid rgba(74,222,128,0.3)">Why CamKnock?</div>
+      <h2 class="section-title" style="color:#fff">The smarter way to meet online</h2>
+      <p class="section-sub" style="color:#A7C4B2;max-width:580px;margin:0 auto">Say goodbye to heavy desktop downloads, 40-minute kickouts, and mandatory registrations.</p>
+    </div>
+
+    <div class="compare-grid">
+      <!-- Old Way / Traditional Apps -->
+      <div class="compare-card old">
+        <div class="compare-card-head">
+          <span class="compare-card-badge">Traditional Meeting Apps</span>
+          <h3>Legacy Software</h3>
+          <p class="compare-card-sub">Bulky software designed a decade ago with unnecessary hurdles.</p>
+        </div>
+        <ul class="compare-list">
+          <li class="compare-row">
+            <div class="compare-icon red">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="compare-text">
+              <div class="compare-item-title">100MB+ Forced Downloads</div>
+              <div class="compare-item-desc">Demands desktop installers and administrative permissions before every call.</div>
+            </div>
+          </li>
+          <li class="compare-row">
+            <div class="compare-icon red">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="compare-text">
+              <div class="compare-item-title">40-Minute Cutoffs</div>
+              <div class="compare-item-desc">Meetings abruptly end right when critical business discussions get started.</div>
+            </div>
+          </li>
+          <li class="compare-row">
+            <div class="compare-icon red">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="compare-text">
+              <div class="compare-item-title">Forced Account Signups</div>
+              <div class="compare-item-desc">Every external guest must create accounts and verify email addresses just to join.</div>
+            </div>
+          </li>
+          <li class="compare-row">
+            <div class="compare-icon red">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="compare-text">
+              <div class="compare-item-title">Paywalled Whiteboard</div>
+              <div class="compare-item-desc">Multiplayer canvas, drawings, and file sharing locked behind expensive tiers.</div>
+            </div>
+          </li>
+          <li class="compare-row">
+            <div class="compare-icon red">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <div class="compare-text">
+              <div class="compare-item-title">Laggy Screen Sharing</div>
+              <div class="compare-item-desc">Noticeable delay, low frame rate, and complex system driver permission popups.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- CamKnock Standard -->
+      <div class="compare-card camknock">
+        <div class="compare-card-head">
+          <span class="compare-card-badge">
+            <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4ADE80;box-shadow:0 0 6px #4ADE80;animation:pulseGreen 1.6s infinite"></span>
+            Next-Gen WebRTC • 100% Free
+          </span>
+          <h3>The CamKnock Experience</h3>
+          <p class="compare-card-sub">Instant browser-native video calling with peer-to-peer clarity.</p>
+        </div>
+        <ul class="compare-list">
+          <li class="compare-row">
+            <div class="compare-icon green">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compare-text">
+              <div class="compare-item-title">2-Second Browser Launch</div>
+              <div class="compare-item-desc">Opens in any browser on Mac, Windows, Linux, or mobile. Zero installation.</div>
+            </div>
+          </li>
+          <li class="compare-row">
+            <div class="compare-icon green">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compare-text">
+              <div class="compare-item-title">Unlimited Meeting Duration</div>
+              <div class="compare-item-desc">Talk for as long as you want without timer warnings or unexpected meeting drops.</div>
+            </div>
+          </li>
+          <li class="compare-row">
+            <div class="compare-icon green">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compare-text">
+              <div class="compare-item-title">1-Click Instant Guest Join</div>
+              <div class="compare-item-desc">Invite colleagues or clients with a 6-digit room code or URL. No signup required.</div>
+            </div>
+          </li>
+          <li class="compare-row">
+            <div class="compare-icon green">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compare-text">
+              <div class="compare-item-title">Free Real-Time Whiteboard</div>
+              <div class="compare-item-desc">Full multiplayer drawing tools, color palettes, eraser, and 1-click PNG export.</div>
+            </div>
+          </li>
+          <li class="compare-row">
+            <div class="compare-icon green">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="compare-text">
+              <div class="compare-item-title">Ultra-Fluid 60 FPS Screen Share</div>
+              <div class="compare-item-desc">Crystal-clear presentation and code sharing with direct hardware acceleration.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works (3 Steps) -->
+<section class="how-section" id="how">
+  <div class="section-header">
+    <div class="section-badge">Simple 3-Step Flow</div>
+    <h2 class="section-title">How CamKnock works</h2>
+    <p class="section-sub">Get your entire team together in under 10 seconds.</p>
+  </div>
+
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-number">1</div>
+      <h3>Create or Enter Room</h3>
+      <p>Sign in to start a new room, or enter any 6-character room code on the homepage.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-number">2</div>
+      <h3>Share One-Click Link</h3>
+      <p>Click "Copy invite link" to send direct access to colleagues, clients, or classmates.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-number">3</div>
+      <h3>Knock &amp; Collaborate</h3>
+      <p>Enjoy HD video, share screens, sketch on the whiteboard, and exchange files live.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Bottom CTA Section -->
+<section class="cta-section">
+  <div class="cta-box">
+    <h2>Ready to upgrade your video meetings?</h2>
+    <p>Join thousands of professionals using CamKnock for faster, cleaner, and more productive remote discussions.</p>
+    <div class="cta-actions">
+      <a href="/signup" class="btn-cta-white">
+        Start Free Meeting &rarr;
+      </a>
+      <a href="#join" class="btn-cta-trans">
+        Join a Meeting
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Professional Footer -->
+<footer>
+  <div class="footer-inner">
+
+    <!-- Top Grid -->
+    <div class="footer-top">
+
+      <!-- Brand Column -->
+      <div class="footer-brand">
+        <a href="/" style="display:inline-flex;align-items:center;gap:12px;text-decoration:none">
+          <img src="/assets/camknock-icon.png" alt="CamKnock" width="38" height="38" style="border-radius:10px;display:block;box-shadow:0 4px 14px rgba(14,122,75,0.3)">
+          <span style="font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.03em">Cam<span style="color:#4ADE80">Knock</span></span>
+        </a>
+        <p class="footer-brand-desc">
+          Crystal-clear video calls, instant screen sharing, and collaborative whiteboard — all in your browser. No downloads required.
+        </p>
+        <div class="footer-social">
+          <!-- Twitter/X -->
+          <a href="#" aria-label="Twitter" title="Follow on X">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <!-- LinkedIn -->
+          <a href="#" aria-label="LinkedIn" title="LinkedIn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+          <!-- GitHub -->
+          <a href="#" aria-label="GitHub" title="GitHub">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          </a>
+          <!-- Email -->
+          <a href="mailto:camknock@gmail.com" aria-label="Email" title="Email us">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Product Column -->
+      <div class="footer-col">
+        <div class="footer-col-title">Product</div>
+        <a href="#features">Features</a>
+        <a href="#whiteboard">Whiteboard</a>
+        <a href="#how">How it works</a>
+        <a href="/join">Join a Meeting</a>
+        <a href="/signup">Create Account</a>
+      </div>
+
+      <!-- Company Column -->
+      <div class="footer-col">
+        <div class="footer-col-title">Company</div>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms & Conditions</a>
+        <a href="/help">Help Center</a>
+        <a href="/portal">Admin & Support Portal</a>
+        <a href="#features">About</a>
+      </div>
+
+      <!-- Contact Column -->
+      <div class="footer-col">
+        <div class="footer-col-title">Contact & Support</div>
+        <a href="tel:+12016852107" class="footer-contact-email" style="color:#A7D4BA">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          +1 201-685-2107
+        </a>
+        <a href="mailto:camknock@gmail.com" class="footer-contact-email">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          camknock@gmail.com
+        </a>
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:8px">
+          <div class="footer-badge"><span></span>WebRTC Encrypted</div>
+          <div class="footer-badge"><span></span>No Download Needed</div>
+          <div class="footer-badge"><span></span>Free to Join</div>
+        </div>
+      </div>
+
+    </div><!-- /footer-top -->
+
+    <!-- Bottom Bar -->
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 CamKnock Inc. All rights reserved.</div>
+      <div class="footer-badges">
+        <div class="footer-badge"><span></span>End-to-end Encrypted</div>
+        <div class="footer-badge"><span></span>Powered by WebRTC</div>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+<!-- JavaScript -->
+<script src="/js/core.js?v=15"></script>
+<script src="/js/auth.js?v=15"></script>
+<script>
+  // Enforce live settings from GET /api/settings
+  (async function() {
+    try {
+      const res = await fetch('/api/settings');
+      if (!res.ok) return;
+      const s = await res.json();
+
+      // 1. Update banner
+      if (s.banner) {
+        const bannerSpan = document.querySelector('.top-banner span');
+        if (bannerSpan) {
+          bannerSpan.innerHTML = `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#4ADE80;box-shadow:0 0 8px #4ADE80;animation:pulseGreen 1.8s infinite"></span> ${s.banner}`;
+        }
+      }
+
+      // 2. Enforce maintenance mode
+      if (Number(s.maintenance) === 1) {
+        const mDiv = document.createElement('div');
+        mDiv.id = 'maintenanceBanner';
+        mDiv.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#DC2626;color:#fff;text-align:center;padding:12px 20px;font-weight:800;font-size:13.5px;box-shadow:0 4px 20px rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;gap:10px';
+        mDiv.innerHTML = '<span>⚠️ System Maintenance Active • Video call joining is temporarily restricted.</span>';
+        document.body.prepend(mDiv);
+      }
+
+      // 3. Enforce guest_join setting
+      if (Number(s.guest_join) === 0) {
+        window._guestJoinDisabled = true;
+      }
+    } catch (e) {}
+  })();
+
+  function switchToJoin() {
+    if (window._guestJoinDisabled && !localStorage.getItem('token')) {
+      alert('Guest access is currently disabled by administrator. Please sign in or register to join meetings.');
+      window.location.href = '/signin';
+      return;
+    }
+    const hub = document.getElementById('auth-hub');
+    if (hub) hub.scrollIntoView({ behavior: 'smooth' });
+    const quickCode = document.getElementById('quickCode');
+    if (quickCode) setTimeout(() => quickCode.focus(), 300);
+  }
+
+  function handleHeroJoin() {
+    if (window._guestJoinDisabled && !localStorage.getItem('token')) {
+      alert('Guest access is currently disabled by administrator. Please sign in or register to join meetings.');
+      window.location.href = '/signin';
+      return;
+    }
+    const input = document.getElementById('heroCodeInput');
+    const raw = (input ? input.value : '').trim();
+    if (!raw) {
+      if (input) input.focus();
+      return;
+    }
+    const quickCode = document.getElementById('quickCode');
+    if (quickCode) quickCode.value = raw;
+    switchToJoin();
+    const quickName = document.getElementById('quickName');
+    if (quickName) setTimeout(() => quickName.focus(), 350);
+  }
+</script>
+</body>
+</html>

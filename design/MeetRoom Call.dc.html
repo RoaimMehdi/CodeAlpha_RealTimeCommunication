@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#0A120E;font-family:'Manrope',system-ui,sans-serif;color:#fff;-webkit-font-smoothing:antialiased;overflow:hidden}
+*{box-sizing:border-box}
+a{color:#4ADE80;text-decoration:none;font-weight:600}
+a:hover{color:#86EFAC;text-decoration:underline}
+</style>
+</helmet>
+<div style="height:100vh;display:flex;flex-direction:column;background:#0A120E">
+  <header style="height:60px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 20px">
+    <div style="display:flex;align-items:center;gap:14px;min-width:0">
+      <div style="width:32px;height:32px;border-radius:9px;background:#0E7A4B;display:grid;place-items:center;flex:none">
+        <div style="width:14px;height:10px;border-radius:2px;background:#fff"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;min-width:0">
+        <div style="font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ roomTitle }}</div>
+        <div style="font-size:12px;color:#A7BDB1;letter-spacing:0.04em">Room {{ roomCode }}</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <sc-if value="{{ recording }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:7px;height:32px;padding:0 12px;border-radius:999px;background:rgba(220,38,38,0.18);color:#FCA5A5;font-size:12px;font-weight:700">
+          <span style="width:8px;height:8px;border-radius:50%;background:#EF4444"></span>REC
+        </div>
+      </sc-if>
+      <div style="display:flex;align-items:center;gap:7px;height:32px;padding:0 12px;border-radius:999px;background:#15221B;font-size:12px;font-weight:700;color:#CFE3D7">
+        <span style="width:7px;height:7px;border-radius:50%;background:#4ADE80"></span>Encrypted
+      </div>
+      <div style="height:32px;padding:0 12px;display:flex;align-items:center;border-radius:999px;background:#15221B;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums">{{ elapsed }}</div>
+      <button onClick="{{ copyInvite }}" style="height:32px;padding:0 14px;border:0;border-radius:999px;background:#0E7A4B;color:#fff;font:inherit;font-size:12px;font-weight:700;cursor:pointer" style-hover="background:#119157">{{ inviteLabel }}</button>
+    </div>
+  </header>
+
+  <div style="flex:1;min-height:0;display:flex;gap:12px;padding:0 12px">
+    <div style="flex:1;min-width:0;display:grid;grid-template-columns:{{ stageCols }};gap:10px">
+      <sc-if value="{{ sharing }}" hint-placeholder-val="{{ false }}">
+        <div style="position:relative;border-radius:18px;overflow:hidden;background:#000;min-height:0">
+          <video ref="{{ shareRef }}" autoPlay="{{ true }}" muted="{{ true }}" playsInline="{{ true }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain"></video>
+          <div style="position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:10px;height:36px;padding:0 6px 0 14px;border-radius:999px;background:rgba(10,18,14,0.8);font-size:13px;font-weight:700">
+            <span style="width:8px;height:8px;border-radius:50%;background:#4ADE80"></span>You are sharing your screen
+            <button onClick="{{ toggleShare }}" style="height:26px;padding:0 10px;border:0;border-radius:999px;background:#DC2626;color:#fff;font:inherit;font-size:12px;font-weight:700;cursor:pointer">Stop</button>
+          </div>
+        </div>
+      </sc-if>
+      <div style="min-height:0;display:grid;grid-template-columns:{{ tileCols }};grid-auto-rows:minmax(0,1fr);gap:10px">
+        <div style="position:relative;min-height:0;border-radius:18px;overflow:hidden;background:#15221B;outline:2px solid {{ selfOutline }};outline-offset:-2px">
+          <video ref="{{ selfRef }}" autoPlay="{{ true }}" muted="{{ true }}" playsInline="{{ true }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:{{ selfVideoDisplay }}"></video>
+          <sc-if value="{{ selfNoVideo }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;text-align:center">
+              <div style="width:84px;height:84px;border-radius:50%;background:#0E7A4B;display:grid;place-items:center;font-size:28px;font-weight:800">AK</div>
+              <div style="font-size:13px;color:#A7BDB1">{{ camNote }}</div>
+            </div>
+          </sc-if>
+          <div style="position:absolute;left:10px;bottom:10px;display:flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:8px;background:rgba(10,18,14,0.72);font-size:12px;font-weight:700">
+            <sc-if value="{{ muted }}" hint-placeholder-val="{{ false }}">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="2.2" stroke-linecap="round"><path d="M9 9v3a3 3 0 0 0 5.1 2.1M15 9.3V5a3 3 0 0 0-5.7-1.3"></path><path d="M19 11a7 7 0 0 1-1.2 3.9M5 11a7 7 0 0 0 11.2 5.6M12 18v3M3 3l18 18"></path></svg>
+            </sc-if>
+            <span>You</span>
+            <sc-if value="{{ handRaised }}" hint-placeholder-val="{{ false }}">
+              <span style="padding:2px 6px;border-radius:5px;background:#F59E0B;color:#1F1300;font-size:11px">Hand raised</span>
+            </sc-if>
+          </div>
+        </div>
+        <sc-for list="{{ people }}" as="p" hint-placeholder-count="3">
+          <div style="position:relative;min-height:0;border-radius:18px;overflow:hidden;background:{{ p.bg }};outline:2px solid {{ p.outline }};outline-offset:-2px;transition:outline-color 0.2s">
+            <div style="position:absolute;inset:0;display:grid;place-items:center">
+              <div style="width:84px;height:84px;border-radius:50%;background:{{ p.avatar }};display:grid;place-items:center;font-size:28px;font-weight:800;color:#0A3D27">{{ p.initials }}</div>
+            </div>
+            <div style="position:absolute;left:10px;bottom:10px;display:flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:8px;background:rgba(10,18,14,0.72);font-size:12px;font-weight:700">
+              <sc-if value="{{ p.muted }}" hint-placeholder-val="{{ false }}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="2.2" stroke-linecap="round"><path d="M9 9v3a3 3 0 0 0 5.1 2.1M15 9.3V5a3 3 0 0 0-5.7-1.3"></path><path d="M19 11a7 7 0 0 1-1.2 3.9M5 11a7 7 0 0 0 11.2 5.6M12 18v3M3 3l18 18"></path></svg>
+              </sc-if>
+              <span>{{ p.name }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <sc-if value="{{ panelOpen }}" hint-placeholder-val="{{ false }}">
+      <aside style="width:340px;flex:none;display:flex;flex-direction:column;border-radius:18px;background:#121D17;overflow:hidden">
+        <div style="height:56px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 18px;border-bottom:1px solid #1F2E26">
+          <div style="display:flex;gap:4px;padding:3px;border-radius:10px;background:#0A120E">
+            <button onClick="{{ openChat }}" style="height:32px;padding:0 14px;border:0;border-radius:8px;background:{{ chatTabBg }};color:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer">Chat</button>
+            <button onClick="{{ openPeople }}" style="height:32px;padding:0 14px;border:0;border-radius:8px;background:{{ peopleTabBg }};color:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer">People ({{ peopleCount }})</button>
+          </div>
+          <button onClick="{{ closePanel }}" aria-label="Close panel" style="width:40px;height:40px;border:0;border-radius:10px;background:transparent;color:#A7BDB1;cursor:pointer;display:grid;place-items:center" style-hover="background:#1F2E26">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+          </button>
+        </div>
+        <sc-if value="{{ isChat }}" hint-placeholder-val="{{ true }}">
+          <div ref="{{ chatScrollRef }}" style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:14px;padding:16px 18px">
+            <sc-for list="{{ messages }}" as="m" hint-placeholder-count="3">
+              <div style="display:flex;flex-direction:column;gap:4px;align-items:{{ m.align }}">
+                <div style="font-size:11px;font-weight:700;color:#A7BDB1">{{ m.from }} · {{ m.time }}</div>
+                <div style="max-width:260px;padding:9px 12px;border-radius:12px;background:{{ m.bg }};font-size:14px;line-height:1.45;text-wrap:pretty">{{ m.text }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <form onSubmit="{{ sendMsg }}" style="flex:none;display:flex;gap:8px;padding:12px;border-top:1px solid #1F2E26">
+            <input value="{{ draft }}" onChange="{{ onDraft }}" placeholder="Message everyone" style="flex:1;min-width:0;height:44px;padding:0 14px;border:1.5px solid #24362C;border-radius:10px;background:#0A120E;color:#fff;font:inherit;font-size:14px;outline:none" style-focus="border-color:#16A34A"></input>
+            <button type="submit" style="height:44px;padding:0 16px;border:0;border-radius:10px;background:#0E7A4B;color:#fff;font:inherit;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#119157">Send</button>
+          </form>
+        </sc-if>
+        <sc-if value="{{ isPeople }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:4px;padding:12px">
+            <div style="display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:10px">
+              <div style="width:36px;height:36px;border-radius:50%;background:#0E7A4B;display:grid;place-items:center;font-size:13px;font-weight:800">AK</div>
+              <div style="flex:1;font-size:14px;font-weight:700">You <span style="font-weight:600;color:#A7BDB1">(Host)</span></div>
+              <div style="font-size:12px;color:#A7BDB1">{{ selfStatus }}</div>
+            </div>
+            <sc-for list="{{ people }}" as="p" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:10px">
+                <div style="width:36px;height:36px;border-radius:50%;background:{{ p.avatar }};color:#0A3D27;display:grid;place-items:center;font-size:13px;font-weight:800">{{ p.initials }}</div>
+                <div style="flex:1;font-size:14px;font-weight:700">{{ p.name }}</div>
+                <div style="font-size:12px;color:#A7BDB1">{{ p.status }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </aside>
+    </sc-if>
+  </div>
+
+  <footer style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px 14px;flex-wrap:wrap">
+    <div style="flex:1 1 140px;font-size:13px;color:#A7BDB1;font-weight:600">{{ footNote }}</div>
+    <div style="display:flex;align-items:flex-start;gap:6px">
+      <button onClick="{{ toggleMic }}" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;font:inherit;cursor:pointer">
+        <span style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:{{ micBg }}">
+          <sc-if value="{{ muted }}" hint-placeholder-val="{{ false }}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 9v3a3 3 0 0 0 5.1 2.1M15 9.3V5a3 3 0 0 0-5.7-1.3"></path><path d="M19 11a7 7 0 0 1-1.2 3.9M5 11a7 7 0 0 0 11.2 5.6M12 18v3M3 3l18 18"></path></svg>
+          </sc-if>
+          <sc-if value="{{ unmuted }}" hint-placeholder-val="{{ true }}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg>
+          </sc-if>
+        </span>
+        <span style="font-size:12px;font-weight:700">{{ micLabel }}</span>
+      </button>
+      <button onClick="{{ toggleCam }}" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;font:inherit;cursor:pointer">
+        <span style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:{{ camBg }}">
+          <sc-if value="{{ camOff }}" hint-placeholder-val="{{ false }}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m4 0h4a2 2 0 0 1 2 2v3.3l1 1L22 8v8"></path><path d="M3 3l18 18"></path></svg>
+          </sc-if>
+          <sc-if value="{{ camOn }}" hint-placeholder-val="{{ true }}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="14" height="14" rx="2"></rect><path d="M16 10l6-3.5v11L16 14"></path></svg>
+          </sc-if>
+        </span>
+        <span style="font-size:12px;font-weight:700">{{ camLabel }}</span>
+      </button>
+      <button onClick="{{ toggleShare }}" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;font:inherit;cursor:pointer">
+        <span style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:{{ shareBg }}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"></rect><path d="M8 21h8M12 17v4M12 13V8M9.5 10.5L12 8l2.5 2.5"></path></svg>
+        </span>
+        <span style="font-size:12px;font-weight:700">{{ shareLabel }}</span>
+      </button>
+      <button onClick="{{ toggleHand }}" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;font:inherit;cursor:pointer">
+        <span style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:{{ handBg }};color:{{ handInk }}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v6M10 10.5V6a2 2 0 0 0-4 0v8"></path><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6-2.4l-3.6-3.6a2 2 0 0 1 2.8-2.8L7 15"></path></svg>
+        </span>
+        <span style="font-size:12px;font-weight:700">{{ handLabel }}</span>
+      </button>
+      <button onClick="{{ toggleRec }}" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;font:inherit;cursor:pointer">
+        <span style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:{{ recBg }}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg>
+        </span>
+        <span style="font-size:12px;font-weight:700">{{ recLabel }}</span>
+      </button>
+      <button onClick="{{ openChat }}" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;font:inherit;cursor:pointer">
+        <span style="position:relative;width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:{{ chatBtnBg }}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z"></path></svg>
+          <sc-if value="{{ unread }}" hint-placeholder-val="{{ false }}">
+            <span style="position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:#16A34A;font-size:11px;font-weight:800;display:grid;place-items:center">{{ unread }}</span>
+          </sc-if>
+        </span>
+        <span style="font-size:12px;font-weight:700">Message</span>
+      </button>
+      <button onClick="{{ openPeople }}" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;font:inherit;cursor:pointer">
+        <span style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:{{ peopleBtnBg }}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"></circle><path d="M2 21a7 7 0 0 1 14 0M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"></path></svg>
+        </span>
+        <span style="font-size:12px;font-weight:700">People</span>
+      </button>
+    </div>
+    <div style="flex:1 1 140px;display:flex;justify-content:flex-end">
+      <button onClick="{{ askLeave }}" style="height:48px;padding:0 22px;border:0;border-radius:14px;background:#DC2626;color:#fff;font:inherit;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:8px" style-hover="background:#B91C1C">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l-5-5 5-5M5 12h11M16 4h3a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-3"></path></svg>
+        Leave
+      </button>
+    </div>
+  </footer>
+
+  <sc-if value="{{ leaving }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ cancelLeave }}" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);display:grid;place-items:center;padding:20px;z-index:10">
+      <div onClick="{{ stop }}" style="width:100%;max-width:380px;display:flex;flex-direction:column;gap:18px;padding:28px;border-radius:20px;background:#121D17;box-shadow:0 30px 80px rgba(0,0,0,0.5)">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <h2 style="margin:0;font-size:22px;font-weight:800">Leave this room?</h2>
+          <p style="margin:0;font-size:14px;color:#A7BDB1;line-height:1.5">You're the host. End the room for everyone, or leave and let the others carry on.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button onClick="{{ endAll }}" style="height:48px;border:0;border-radius:12px;background:#DC2626;color:#fff;font:inherit;font-size:15px;font-weight:800;cursor:pointer" style-hover="background:#B91C1C">End room for all</button>
+          <button onClick="{{ leave }}" style="height:48px;border:1.5px solid #2B3F34;border-radius:12px;background:transparent;color:#fff;font:inherit;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#1F2E26">Leave room</button>
+          <button onClick="{{ cancelLeave }}" style="height:44px;border:0;border-radius:12px;background:transparent;color:#A7BDB1;font:inherit;font-size:14px;font-weight:700;cursor:pointer">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    const q = new URLSearchParams(location.search);
+    this.room = q.get('room') || '482 913 607';
+    this.isStart = q.get('mode') !== 'join';
+    this.state = {
+      camOn: q.get('cam') !== '0', muted: q.get('mic') === '0', camError: '', hasStream: false,
+      sharing: false, hand: false, rec: false, panel: null, draft: '', unread: 2, leaving: false,
+      speaking: 1, start: Date.now(), now: Date.now(), copied: false,
+      messages: [
+        { from: 'Priya Shah', text: 'Morning all, joining from the studio today.', time: '10:01', me: false },
+        { from: 'Daniel Okafor', text: 'I\u2019ll share the roadmap after intros.', time: '10:02', me: false }
+      ]
+    };
+    this.selfRef = el => { this.selfEl = el; if (el && this.stream && el.srcObject !== this.stream) el.srcObject = this.stream; };
+    this.shareRef = el => { this.shareEl = el; if (el && this.shareStream && el.srcObject !== this.shareStream) el.srcObject = this.shareStream; };
+    this.chatScrollRef = el => { this.chatEl = el; if (el) el.scrollTop = el.scrollHeight; };
+  }
+  async getCam() {
+    try {
+      const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      this.stream = s;
+      s.getAudioTracks().forEach(t => t.enabled = !this.state.muted);
+      s.getVideoTracks().forEach(t => t.enabled = this.state.camOn);
+      if (this.selfEl) this.selfEl.srcObject = s;
+      this.setState({ hasStream: true, camError: '' });
+    } catch (e) {
+      this.setState({ camError: 'Camera unavailable — check browser permissions' });
+    }
+  }
+  componentDidMount() {
+    this.getCam();
+    this.tick = setInterval(() => this.setState({ now: Date.now() }), 1000);
+    this.spk = setInterval(() => this.setState(s => ({ speaking: Math.floor(Math.random() * 4) })), 2600);
+  }
+  componentDidUpdate() { if (this.chatEl) this.chatEl.scrollTop = this.chatEl.scrollHeight; }
+  componentWillUnmount() {
+    clearInterval(this.tick); clearInterval(this.spk); clearTimeout(this.ct);
+    [this.stream, this.shareStream].forEach(s => s && s.getTracks().forEach(t => t.stop()));
+  }
+  async toggleShare() {
+    if (this.state.sharing) {
+      this.shareStream && this.shareStream.getTracks().forEach(t => t.stop());
+      this.shareStream = null;
+      return this.setState({ sharing: false });
+    }
+    try {
+      const s = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      this.shareStream = s;
+      s.getVideoTracks()[0].addEventListener('ended', () => { this.shareStream = null; this.setState({ sharing: false }); });
+      this.setState({ sharing: true });
+    } catch (e) {}
+  }
+  exit() {
+    [this.stream, this.shareStream].forEach(s => s && s.getTracks().forEach(t => t.stop()));
+    location.href = 'MeetRoom%20Home.dc.html';
+  }
+  renderVals() {
+    const s = this.state;
+    const sec = Math.floor((s.now - s.start) / 1000);
+    const pad = n => String(n).padStart(2, '0');
+    const elapsed = (sec >= 3600 ? Math.floor(sec / 3600) + ':' : '') + pad(Math.floor(sec / 60) % 60) + ':' + pad(sec % 60);
+    const base = [
+      { name: 'Priya Shah', initials: 'PS', avatar: '#A7F3D0', muted: false },
+      { name: 'Daniel Okafor', initials: 'DO', avatar: '#D9F99D', muted: true },
+      { name: 'Mei Lin', initials: 'ML', avatar: '#BBF7D0', muted: false }
+    ];
+    const people = base.map((p, i) => ({ ...p, bg: '#15221B', outline: s.speaking === i + 1 && !p.muted ? '#22C55E' : 'transparent', status: p.muted ? 'Muted' : (s.speaking === i + 1 ? 'Speaking' : 'Listening') }));
+    const panel = s.panel;
+    const btn = on => on ? '#24362C' : '#1A2820';
+    const showVideo = s.camOn && s.hasStream;
+    const now = new Date();
+    return {
+      roomTitle: this.isStart ? 'AK\u2019s Room' : 'Team Room',
+      roomCode: this.room, elapsed,
+      recording: s.rec,
+      inviteLabel: s.copied ? 'Link copied' : 'Copy invite',
+      copyInvite: () => { try { navigator.clipboard.writeText('https://meetroom.app/r/' + this.room.replace(/\s/g, '')); } catch (e) {} this.setState({ copied: true }); clearTimeout(this.ct); this.ct = setTimeout(() => this.setState({ copied: false }), 1800); },
+      sharing: s.sharing,
+      stageCols: s.sharing ? 'minmax(0,1fr) 260px' : 'minmax(0,1fr)',
+      tileCols: s.sharing ? 'minmax(0,1fr)' : 'repeat(2,minmax(0,1fr))',
+      selfRef: this.selfRef, shareRef: this.shareRef, chatScrollRef: this.chatScrollRef,
+      selfVideoDisplay: showVideo ? 'block' : 'none',
+      selfNoVideo: !showVideo,
+      camNote: s.camError || (s.camOn ? 'Starting camera…' : 'Your camera is off'),
+      selfOutline: s.speaking === 0 && !s.muted ? '#22C55E' : 'transparent',
+      muted: s.muted, unmuted: !s.muted, handRaised: s.hand,
+      people, peopleCount: 4,
+      panelOpen: !!panel, isChat: panel === 'chat', isPeople: panel === 'people',
+      chatTabBg: panel === 'chat' ? '#24362C' : 'transparent', peopleTabBg: panel === 'people' ? '#24362C' : 'transparent',
+      openChat: () => this.setState({ panel: panel === 'chat' ? null : 'chat', unread: 0 }),
+      openPeople: () => this.setState({ panel: panel === 'people' ? null : 'people' }),
+      closePanel: () => this.setState({ panel: null }),
+      messages: s.messages.map(m => ({ ...m, align: m.me ? 'flex-end' : 'flex-start', bg: m.me ? '#0E7A4B' : '#1F2E26' })),
+      draft: s.draft, onDraft: e => this.setState({ draft: e.target.value }),
+      sendMsg: e => { e.preventDefault(); const t = s.draft.trim(); if (!t) return; this.setState({ draft: '', messages: [...s.messages, { from: 'You', text: t, time: pad(now.getHours()) + ':' + pad(now.getMinutes()), me: true }] }); },
+      unread: s.unread,
+      selfStatus: s.muted ? 'Muted' : 'Mic on',
+      footNote: s.sharing ? 'Sharing your screen' : (s.hand ? 'Your hand is raised' : '4 in this room'),
+      micBg: s.muted ? '#DC2626' : btn(false), micLabel: s.muted ? 'Unmute' : 'Mute',
+      toggleMic: () => { const m = !s.muted; this.stream && this.stream.getAudioTracks().forEach(t => t.enabled = !m); this.setState({ muted: m }); },
+      camOn: s.camOn, camOff: !s.camOn,
+      camBg: s.camOn ? btn(false) : '#DC2626', camLabel: s.camOn ? 'Stop video' : 'Start video',
+      toggleCam: () => { const c = !s.camOn; if (this.stream) this.stream.getVideoTracks().forEach(t => t.enabled = c); else if (c) this.getCam(); this.setState({ camOn: c }); },
+      shareBg: s.sharing ? '#16A34A' : btn(false), shareLabel: s.sharing ? 'Stop share' : 'Share',
+      toggleShare: () => this.toggleShare(),
+      handBg: s.hand ? '#F59E0B' : btn(false), handInk: s.hand ? '#1F1300' : '#fff', handLabel: s.hand ? 'Lower' : 'Raise',
+      toggleHand: () => this.setState({ hand: !s.hand }),
+      recBg: s.rec ? '#7F1D1D' : btn(false), recLabel: s.rec ? 'Stop rec' : 'Record',
+      toggleRec: () => this.setState({ rec: !s.rec }),
+      chatBtnBg: panel === 'chat' ? '#0E7A4B' : btn(false), peopleBtnBg: panel === 'people' ? '#0E7A4B' : btn(false),
+      leaving: s.leaving,
+      askLeave: () => this.setState({ leaving: true }),
+      cancelLeave: () => this.setState({ leaving: false }),
+      stop: e => e.stopPropagation(),
+      leave: () => this.exit(), endAll: () => this.exit()
+    };
+  }
+}
+</script>
+</body>
+</html>

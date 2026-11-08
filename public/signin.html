@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CamKnock — Sign In</title>
+  <link rel="icon" href="/assets/camknock-icon.png" type="image/png">
+  <meta name="theme-color" content="#0E7A4B">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #F8FCFA;
+      font-family: 'Manrope', system-ui, sans-serif;
+      color: #10231a;
+      -webkit-font-smoothing: antialiased;
+    }
+    * { box-sizing: border-box; }
+    a { color: #0E7A4B; text-decoration: none; font-weight: 600; }
+    a:hover { color: #0A5E39; text-decoration: underline; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { opacity: 0.7; cursor: default; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .anim-in { animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+    .input-field {
+      width: 100%;
+      height: 50px;
+      padding: 0 16px;
+      border: 1.5px solid #DCE6E0;
+      border-radius: 12px;
+      font-size: 15px;
+      color: #10231a;
+      outline: none;
+      background: #fff;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .input-field:focus {
+      border-color: #0E7A4B !important;
+      box-shadow: 0 0 0 4px rgba(14, 122, 75, 0.15) !important;
+    }
+    .input-field.has-error { border-color: #B42318 !important; }
+    .err-text {
+      font-size: 13px;
+      color: #B42318;
+      font-weight: 600;
+      min-height: 18px;
+      margin: 2px 0 0;
+    }
+    .btn-submit {
+      height: 52px;
+      border: 0;
+      border-radius: 12px;
+      background: #0E7A4B;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background 0.15s ease, transform 0.15s ease;
+      width: 100%;
+    }
+    .btn-submit:hover:not(:disabled) {
+      background: #0A5E39;
+      transform: translateY(-1px);
+    }
+    .hidden { display: none !important; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2.5px solid rgba(255, 255, 255, 0.4);
+      border-top-color: #fff;
+      animation: spin 0.8s linear infinite;
+    }
+  </style>
+</head>
+<body>
+<div style="min-height:100vh;display:flex;flex-wrap:wrap;gap:12px;padding:12px;background:#F8FCFA">
+
+  <!-- Left Side Art Slideshow -->
+  <aside style="flex:1.15 1 380px;position:relative;min-height:min(calc(100vh - 24px),560px);border-radius:24px;overflow:hidden;background:#0B5D3B;color:#fff">
+    <div id="slide0" style="position:absolute;inset:0;opacity:1;pointer-events:auto;transform:scale(1.06);transition:opacity 0.9s ease,transform 6s ease-out">
+      <img src="https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?fm=jpg&q=70&w=1600&auto=format&fit=crop" alt="" style="width:100%;height:100%;object-fit:cover">
+    </div>
+    <div id="slide1" style="position:absolute;inset:0;opacity:0;pointer-events:none;transform:scale(1);transition:opacity 0.9s ease,transform 6s ease-out">
+      <img src="https://images.unsplash.com/photo-1787647562201-113361490c83?fm=jpg&q=70&w=1600&auto=format&fit=crop" alt="" style="width:100%;height:100%;object-fit:cover">
+    </div>
+    <div id="slide2" style="position:absolute;inset:0;opacity:0;pointer-events:none;transform:scale(1);transition:opacity 0.9s ease,transform 6s ease-out">
+      <img src="https://images.unsplash.com/photo-1616587894289-86480e533129?fm=jpg&q=70&w=1600&auto=format&fit=crop" alt="" style="width:100%;height:100%;object-fit:cover">
+    </div>
+
+    <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(4,38,24,0.55) 0%,rgba(4,38,24,0) 22%,rgba(4,38,24,0) 45%,rgba(4,38,24,0.55) 78%,rgba(4,38,24,0.35) 100%)"></div>
+
+    <div style="position:absolute;top:24px;left:24px;right:24px;display:flex;align-items:center;justify-content:space-between;gap:12px;pointer-events:none;z-index:2">
+      <a href="/" style="display:flex;align-items:center;gap:11px;pointer-events:auto;text-decoration:none">
+        <img src="/assets/camknock-icon.png" width="38" height="38" alt="CamKnock" style="border-radius:10px;display:block;box-shadow:0 4px 12px rgba(0,0,0,0.25)">
+        <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;color:#fff;display:flex;align-items:center">
+          Cam<span style="color:#4ADE80">Knock</span>
+        </div>
+      </a>
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.28);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);font-size:12px;font-weight:700">
+        <span style="width:7px;height:7px;border-radius:50%;background:#4ADE80"></span>
+        <span>Secure Video Calling</span>
+      </div>
+    </div>
+
+    <div style="position:absolute;left:24px;right:24px;bottom:44px;display:flex;flex-direction:column;gap:18px;padding:24px 26px;border-radius:20px;background:rgba(6,52,33,0.62);color:#fff;border:1px solid rgba(255,255,255,0.22);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);z-index:2">
+      <h1 style="margin:0;font-size:32px;line-height:1.12;font-weight:800;letter-spacing:-0.03em">Welcome back to CamKnock</h1>
+      <p style="margin:0;font-size:15px;line-height:1.5">Sign in to manage your meetings, host new video calls, and collaborate seamlessly.</p>
+    </div>
+  </aside>
+
+  <!-- Right Main Area -->
+  <main class="anim-in" style="flex:1 1 360px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:20px;padding:20px 24px;border-radius:24px;background:#F2F8F4">
+    <div style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <a href="/" style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#0A5E39">
+        &larr; Back to Home
+      </a>
+      <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#4B5F55">
+        <span>New to CamKnock?</span>
+        <a href="/signup" style="height:36px;padding:0 14px;display:inline-flex;align-items:center;border-radius:999px;border:1.5px solid #CFE3D7;background:#fff;color:#0A5E39;font-weight:700;text-decoration:none">Sign up free</a>
+      </div>
+    </div>
+
+    <!-- Auth Card -->
+    <div style="width:100%;max-width:480px;display:flex;flex-direction:column;gap:24px;background:#fff;padding:40px 36px;border-radius:22px;box-shadow:0 1px 2px rgba(10,61,39,0.06), 0 16px 40px rgba(10,61,39,0.08);border:1.5px solid #E1ECE5">
+      <form id="signinForm" novalidate style="display:flex;flex-direction:column;gap:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <h2 style="margin:0;font-size:26px;font-weight:800;color:#0A2E1D">Sign In</h2>
+            <p style="margin:4px 0 0;font-size:14px;color:#4B5F55">Access your CamKnock host account.</p>
+          </div>
+          <button type="button" id="fillDemoBtn" style="border:0;background:rgba(14,122,75,0.1);color:#0E7A4B;font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px;cursor:pointer">Fill demo account</button>
+        </div>
+
+        <label style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:13px;font-weight:700">Email address</span>
+          <input type="email" id="email" class="input-field" placeholder="you@company.com" autocomplete="email">
+          <span id="emailErr" class="err-text"></span>
+        </label>
+
+        <label style="display:flex;flex-direction:column;gap:6px">
+          <span style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;font-weight:700">Password</span>
+            <a href="/signup" style="font-size:13px">Forgot password?</a>
+          </span>
+          <span style="position:relative;display:block">
+            <input type="password" id="password" class="input-field" placeholder="At least 6 characters" autocomplete="current-password" style="padding-right:72px">
+            <button type="button" id="togglePw" style="position:absolute;right:8px;top:7px;height:36px;padding:0 12px;border:0;border-radius:8px;background:transparent;font-size:13px;font-weight:700;color:#0E7A4B;cursor:pointer">Show</button>
+          </span>
+          <span id="pwErr" class="err-text"></span>
+        </label>
+
+        <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer">
+          <input type="checkbox" id="remember" checked style="width:18px;height:18px;accent-color:#0E7A4B;margin:0">
+          <span>Keep me signed in</span>
+        </label>
+
+        <button id="signinBtn" type="submit" class="btn-submit">
+          <span id="signinSpinner" class="spin hidden"></span>
+          <span id="signinLabel">Sign in &rarr;</span>
+        </button>
+
+        <div id="authOk" class="hidden" style="padding:12px 14px;border-radius:10px;background:#E6F4EC;color:#0A5E39;font-size:14px;font-weight:600;text-align:center">
+          Signed in! Taking you to your dashboard…
+        </div>
+
+        <p style="margin:4px 0 0;font-size:14px;color:#4B5F55;text-align:center">
+          Don’t have an account? <a href="/signup">Sign up free</a>
+        </p>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px;color:#4B5F55">
+      <span>© 2026 CamKnock. All rights reserved.</span>
+      <div style="display:flex;gap:18px">
+        <a href="/privacy" style="color:#4B5F55;font-weight:600">Privacy</a>
+        <a href="/terms" style="color:#4B5F55;font-weight:600">Terms</a>
+        <a href="/help" style="color:#4B5F55;font-weight:600">Help</a>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/js/core.js?v=15"></script>
+<script src="/js/auth.js?v=15"></script>
+</body>
+</html>
+

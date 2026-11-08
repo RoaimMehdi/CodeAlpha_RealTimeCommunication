@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Help & Support Center — CamKnock</title>
+  <link rel="icon" href="/assets/camknock-icon.png" type="image/png">
+  <meta name="theme-color" content="#0E7A4B">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #F2F8F4;
+      font-family: 'Manrope', system-ui, sans-serif;
+      color: #10231a;
+      -webkit-font-smoothing: antialiased;
+    }
+    * { box-sizing: border-box; }
+    a { color: #0E7A4B; text-decoration: none; font-weight: 600; }
+    a:hover { text-decoration: underline; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-nav  { animation: slideDown 0.4s cubic-bezier(.22,.68,0,1.2) both; }
+    .hero      { animation: fadeInUp 0.5s cubic-bezier(.22,.68,0,1.2) 0.1s both; }
+    .doc-body  { animation: fadeInUp 0.5s cubic-bezier(.22,.68,0,1.2) 0.2s both; }
+
+    .nav-wrap {
+      max-width: 1040px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; height: 64px;
+    }
+    .logo-row { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-text { font-size: 18px; font-weight: 800; color: #10231a; letter-spacing: -0.3px; }
+    .back-btn {
+      display: flex; align-items: center; gap: 7px;
+      height: 36px; padding: 0 16px; border: 1.5px solid #C8DDD4; border-radius: 999px;
+      background: #fff; color: #10231a; font-family: inherit; font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: background 0.15s, border-color 0.15s;
+    }
+    .back-btn:hover { background: #E8F5EE; border-color: #0E7A4B; }
+
+    .hero-wrap {
+      background: linear-gradient(135deg, #0E7A4B 0%, #0A5E39 100%);
+      padding: 64px 24px 56px;
+      text-align: center;
+      color: #fff;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      height: 30px; padding: 0 14px; border-radius: 999px;
+      background: rgba(255,255,255,0.18); color: #fff;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero-title { font-size: clamp(28px,5vw,44px); font-weight: 800; margin: 0 0 14px; line-height: 1.15; }
+    .hero-sub   { font-size: 16px; color: rgba(255,255,255,0.85); margin: 0 auto 28px; max-width: 520px; }
+
+    .search-box {
+      max-width: 500px; margin: 0 auto; position: relative;
+    }
+    .search-input {
+      width: 100%; height: 50px; border-radius: 999px; border: 0; outline: none;
+      padding: 0 20px 0 46px; font-size: 15px; font-family: inherit;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    .search-icon {
+      position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+      pointer-events: none; color: #8BA89B;
+    }
+
+    .main-wrap { max-width: 1040px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    /* Topic Cards Grid */
+    .topics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 56px;
+    }
+    .topic-card {
+      background: #fff;
+      border: 1.5px solid #DCE6E0;
+      border-radius: 16px;
+      padding: 24px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      cursor: pointer;
+    }
+    .topic-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(14,122,75,0.1);
+      border-color: #0E7A4B;
+    }
+    .topic-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: #E8F5EE; color: #0E7A4B; display: grid; place-items: center;
+      margin-bottom: 16px; font-size: 20px;
+    }
+    .topic-title { font-size: 17px; font-weight: 800; color: #10231a; margin: 0 0 8px; }
+    .topic-desc  { font-size: 14px; color: #4B5F55; line-height: 1.6; margin: 0; }
+
+    /* FAQ Accordion */
+    .faq-sec-title {
+      font-size: 24px; font-weight: 800; color: #0A3D27; margin: 0 0 24px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .faq-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 60px; }
+    .faq-item {
+      background: #fff; border: 1.5px solid #DCE6E0; border-radius: 14px;
+      overflow: hidden; transition: border-color 0.2s;
+    }
+    .faq-item.open { border-color: #0E7A4B; }
+    .faq-q {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 22px; cursor: pointer; user-select: none;
+      font-size: 16px; font-weight: 700; color: #10231a;
+    }
+    .faq-q:hover { background: #F8FCFA; }
+    .faq-arrow {
+      width: 20px; height: 20px; color: #0E7A4B; transition: transform 0.25s ease;
+      flex: none; margin-left: 12px;
+    }
+    .faq-item.open .faq-arrow { transform: rotate(180deg); }
+    .faq-a {
+      display: none; padding: 0 22px 20px; font-size: 14px; line-height: 1.7; color: #4B5F55;
+      border-top: 1px solid #EEF5F1; padding-top: 14px;
+    }
+    .faq-item.open .faq-a { display: block; }
+
+    /* Contact Banner */
+    .contact-banner {
+      background: linear-gradient(135deg, #10231a 0%, #0A3D27 100%);
+      border-radius: 20px; padding: 48px 36px; text-align: center; color: #fff;
+      box-shadow: 0 16px 36px rgba(10,61,39,0.18);
+    }
+    .contact-banner h2 { font-size: 28px; font-weight: 800; margin: 0 0 12px; }
+    .contact-banner p { font-size: 15px; color: rgba(255,255,255,0.78); max-width: 480px; margin: 0 auto 28px; line-height: 1.6; }
+    .contact-email-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      height: 50px; padding: 0 28px; border-radius: 999px;
+      background: #0E7A4B; color: #fff; font-size: 15px; font-weight: 800;
+      text-decoration: none; transition: transform 0.15s, background 0.15s;
+    }
+    .contact-email-btn:hover { background: #119157; transform: translateY(-2px); text-decoration: none; }
+
+    footer {
+      background: #fff; border-top: 1px solid #DCE6E0;
+      padding: 24px; text-align: center;
+      font-size: 13px; color: #4B5F55;
+    }
+    footer a { color: #4B5F55; font-weight: 600; margin: 0 10px; }
+    footer a:hover { color: #0E7A4B; }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav style="background:#fff;border-bottom:1px solid #DCE6E0;position:sticky;top:0;z-index:100" class="page-nav">
+  <div class="nav-wrap">
+    <a href="/" class="logo-row">
+      <img src="/assets/camknock-icon.png" alt="CamKnock" width="36" height="36" style="border-radius:10px;display:block;box-shadow:0 3px 10px rgba(14,122,75,0.2)">
+      <span class="logo-text">Cam<span style="color:#0E7A4B">Knock</span></span>
+    </a>
+    <div style="display:flex;align-items:center;gap:12px">
+      <a href="/" style="font-size:14px;color:#4B5F55;font-weight:600">Home</a>
+      <a href="/join" style="font-size:14px;color:#4B5F55;font-weight:600">Join Meeting</a>
+      <button class="back-btn" onclick="history.back()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Back
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero-wrap hero">
+  <div class="hero-badge">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Help &amp; Knowledge Base
+  </div>
+  <h1 class="hero-title">How can we help you?</h1>
+  <p class="hero-sub">Explore guides, troubleshooting steps, and answers to common questions about CamKnock video calls.</p>
+  <div class="search-box">
+    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="helpSearch" class="search-input" placeholder="Search guides, camera, audio, whiteboard...">
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-wrap doc-body">
+
+  <!-- Category Cards -->
+  <div class="topics-grid">
+    <div class="topic-card" onclick="filterFaq('join')">
+      <div class="topic-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+      </div>
+      <h3 class="topic-title">Joining &amp; Hosting</h3>
+      <p class="topic-desc">How to start an instant meeting, invite team members with a 6-digit room code, or join as a guest.</p>
+    </div>
+
+    <div class="topic-card" onclick="filterFaq('camera')">
+      <div class="topic-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+      </div>
+      <h3 class="topic-title">Audio &amp; Video Setup</h3>
+      <p class="topic-desc">Fixing microphone and webcam permissions, selecting devices, and echo troubleshooting.</p>
+    </div>
+
+    <div class="topic-card" onclick="filterFaq('screen')">
+      <div class="topic-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </div>
+      <h3 class="topic-title">Screen Sharing</h3>
+      <p class="topic-desc">Sharing your whole desktop, specific application window, or browser tab with full clarity.</p>
+    </div>
+
+    <div class="topic-card" onclick="filterFaq('whiteboard')">
+      <div class="topic-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+      </div>
+      <h3 class="topic-title">Multiplayer Whiteboard</h3>
+      <p class="topic-desc">Collaborate on the real-time canvas, use drawing tools, change colors, and export PNG drawings.</p>
+    </div>
+
+    <div class="topic-card" onclick="filterFaq('files')">
+      <div class="topic-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </div>
+      <h3 class="topic-title">Chat &amp; File Sharing</h3>
+      <p class="topic-desc">Send instant messages and securely transfer documents up to 25MB directly inside your call.</p>
+    </div>
+
+    <div class="topic-card" onclick="filterFaq('security')">
+      <div class="topic-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h3 class="topic-title">Security &amp; Encryption</h3>
+      <p class="topic-desc">How CamKnock protects peer-to-peer WebRTC calls with end-to-end transport security.</p>
+    </div>
+  </div>
+
+  <!-- Frequently Asked Questions -->
+  <h2 class="faq-sec-title">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0E7A4B" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Frequently Asked Questions
+  </h2>
+
+  <div class="faq-list" id="faqList">
+    <!-- Q1 -->
+    <div class="faq-item open" data-tags="join host code">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span>How do I join or invite someone to a meeting?</span>
+        <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a">
+        To join, enter the 6-character room code on the homepage or <a href="/join">Join page</a> and click <strong>Join Meeting</strong>. No account is required for guests!<br><br>
+        To invite team members, click the green <strong>"Copy link"</strong> button in the call header. The link copied will look like <code>http://your-site/r/abc123</code> which will bring them directly into your room.
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="faq-item" data-tags="camera mic permission audio video">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span>Why is my camera or microphone not working?</span>
+        <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a">
+        1. Click the padlock icon in your browser's URL address bar.<br>
+        2. Make sure <strong>Camera</strong> and <strong>Microphone</strong> permissions are set to <strong>"Allow"</strong>.<br>
+        3. Ensure no other application (Zoom, Teams, Skype) is currently using your webcam.<br>
+        4. Reload the page to apply new permissions.
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="faq-item" data-tags="screen share window desktop display">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span>How does screen sharing work in CamKnock?</span>
+        <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a">
+        Click the <strong>"Share"</strong> button in the bottom control bar during any call. Your browser will show a prompt allowing you to pick your entire screen, an application window, or a specific browser tab.<br><br>
+        All other participants will instantly see your shared screen in the main spotlight stage. To stop, click the red <strong>"Stop"</strong> button at the top left of the screen share container or the bottom control bar.
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="faq-item" data-tags="whiteboard draw board tool png">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span>How do I use the collaborative Whiteboard?</span>
+        <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a">
+        Click the <strong>"Board"</strong> button in the call controls to toggle the whiteboard. Anyone in the meeting can draw simultaneously with real-time sync!<br>
+        • Select colors from the swatch bar.<br>
+        • Switch between <strong>Pen</strong> and <strong>Eraser</strong> modes.<br>
+        • Adjust stroke thickness (thin, medium, thick).<br>
+        • Click <strong>"Save PNG"</strong> to download a snapshot of the whiteboard to your device.
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="faq-item" data-tags="account signup signin password demo">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span>Do I need an account to use CamKnock?</span>
+        <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a">
+        <strong>Guests:</strong> No account needed! You can join any room with just a display name and the room code.<br>
+        <strong>Meeting Hosts:</strong> Yes, hosts can sign up for a free account to create and manage meeting rooms. Registration requires only your name, email, and password.
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="faq-item" data-tags="files upload limit size chat">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        <span>What is the file upload size limit?</span>
+        <svg class="faq-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="faq-a">
+        You can upload and share files up to <strong>25MB</strong> per file within the in-meeting chat. Supported formats include images, PDF documents, code snippets, presentations, and archives.
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Us Banner -->
+  <div class="contact-banner">
+    <h2>Still need help? Get in touch</h2>
+    <p>Have an issue, bug report, or feature suggestion? Our support team is available 24/7 to assist you.</p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap">
+      <a href="tel:+12016852107" class="contact-email-btn" style="background:#062615;border:1px solid #22C55E">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        +1 201-685-2107
+      </a>
+      <a href="mailto:camknock@gmail.com" class="contact-email-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+        camknock@gmail.com
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer style="background:#fff;border-top:1px solid #DCE6E0;padding:36px 24px;margin-top:60px">
+  <div style="max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <img src="/assets/camknock-icon.png" width="28" height="28" alt="CamKnock" style="border-radius:7px;display:block">
+      <span style="font-size:14px;font-weight:700;color:#0A3D27">Cam<span style="color:#0E7A4B">Knock</span></span>
+      <span style="color:#94A3B8;margin:0 4px">•</span>
+      <span style="font-size:13px;color:#64748B">© 2026 All rights reserved.</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:18px;font-size:13px;flex-wrap:wrap">
+      <a href="/" style="color:#4B5F55;font-weight:600;text-decoration:none">Home</a>
+      <a href="/portal" style="color:#0E7A4B;font-weight:700;text-decoration:none">Portal</a>
+      <a href="/privacy" style="color:#4B5F55;font-weight:600;text-decoration:none">Privacy</a>
+      <a href="/terms" style="color:#4B5F55;font-weight:600;text-decoration:none">Terms</a>
+      <a href="/help" style="color:#4B5F55;font-weight:600;text-decoration:none">Help</a>
+      <a href="tel:+12016852107" style="color:#4B5F55;font-weight:600;text-decoration:none">+1 201-685-2107</a>
+      <a href="mailto:camknock@gmail.com" style="color:#0E7A4B;font-weight:700;text-decoration:none">camknock@gmail.com</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function toggleFaq(el) {
+    const item = el.parentElement;
+    item.classList.toggle('open');
+  }
+
+  function filterFaq(tag) {
+    const items = document.querySelectorAll('.faq-item');
+    items.forEach(item => {
+      const tags = item.getAttribute('data-tags') || '';
+      if (tags.includes(tag)) {
+        item.style.display = 'block';
+        item.classList.add('open');
+      } else {
+        item.style.display = 'none';
+      }
+    });
+    document.getElementById('faqList').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  document.getElementById('helpSearch').addEventListener('input', function(e) {
+    const q = e.target.value.toLowerCase().trim();
+    const items = document.querySelectorAll('.faq-item');
+    items.forEach(item => {
+      const text = item.textContent.toLowerCase() + ' ' + (item.getAttribute('data-tags') || '');
+      if (!q || text.includes(q)) {
+        item.style.display = 'block';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  });
+</script>
+</body>
+</html>
+

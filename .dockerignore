@@ -1,0 +1,8 @@
+node_modules
+uploads
+design
+.git
+.env
+.env.*
+*.log
+*.md

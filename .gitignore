@@ -1,0 +1,21 @@
+# dependencies
+node_modules/
+
+# secrets
+.env
+.env.*
+!.env.example
+
+# runtime data
+uploads/*
+!uploads/.gitkeep
+server.log
+*.log
+
+# tooling
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+coverage/
+*.tmp.js

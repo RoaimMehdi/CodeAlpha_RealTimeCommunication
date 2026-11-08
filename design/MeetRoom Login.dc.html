@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+html,body{margin:0;padding:0;background:#fff;font-family:'Manrope',system-ui,sans-serif;color:#10231a;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0E7A4B;text-decoration:none;font-weight:600}
+a:hover{color:#0A5E39;text-decoration:underline}
+@keyframes mrspin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-wrap:wrap;background:#fff">
+  <sc-if value="{{ isSplit }}" hint-placeholder-val="{{ true }}">
+    <aside style="flex:1 1 440px;min-height:{{ brandMinH }};background:{{ brandBg }};color:{{ brandInk }};padding:40px 48px;display:flex;flex-direction:column;gap:32px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:12px;background:{{ logoBg }};display:grid;place-items:center">
+          <div style="width:18px;height:13px;border-radius:3px;background:{{ logoInk }};position:relative"></div>
+        </div>
+        <div style="font-size:22px;font-weight:800;letter-spacing:-0.02em">MeetRoom</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:28px;max-width:520px">
+        <div style="position:relative;width:100%;aspect-ratio:16/10">
+          <sc-for list="{{ slides }}" as="sl" hint-placeholder-count="3">
+            <div style="position:absolute;inset:0;border-radius:20px;overflow:hidden;opacity:{{ sl.opacity }};pointer-events:{{ sl.pe }};transition:opacity 0.6s ease">
+              <image-slot id="{{ sl.slotId }}" shape="rounded" radius="20" placeholder="{{ sl.placeholder }}" src="{{ sl.src }}" credit="{{ sl.credit }}" credit-href="{{ sl.creditHref }}"></image-slot>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:grid;min-height:150px">
+          <sc-for list="{{ slides }}" as="sl" hint-placeholder-count="1">
+            <div style="grid-area:1/1;display:flex;flex-direction:column;gap:14px;opacity:{{ sl.opacity }};transform:translateY({{ sl.shift }});transition:opacity 0.5s ease,transform 0.5s ease;pointer-events:{{ sl.pe }}">
+              <h1 style="margin:0;font-size:40px;line-height:1.1;font-weight:800;letter-spacing:-0.03em;text-wrap:balance">{{ sl.title }}</h1>
+              <p style="margin:0;font-size:17px;line-height:1.55;opacity:0.9;text-wrap:pretty">{{ sl.body }}</p>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <sc-for list="{{ slides }}" as="sl" hint-placeholder-count="3">
+            <button onClick="{{ sl.go }}" aria-label="{{ sl.title }}" style="width:{{ sl.dotW }};height:8px;padding:0;border:0;border-radius:4px;background:{{ brandInk }};opacity:{{ sl.dotO }};cursor:pointer;transition:width 0.3s ease,opacity 0.3s ease"></button>
+          </sc-for>
+        </div>
+      </div>
+      <div style="font-size:13px;opacity:0.8">© 2026 MeetRoom</div>
+    </aside>
+  </sc-if>
+
+  <main style="flex:1 1 440px;display:flex;align-items:center;justify-content:center;padding:48px 24px;background:{{ mainBg }}">
+    <div style="width:100%;max-width:420px;display:flex;flex-direction:column;gap:28px;background:#fff;padding:{{ cardPad }};border-radius:20px;box-shadow:{{ cardShadow }}">
+      <sc-if value="{{ isCentered }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:10px;background:#0E7A4B;display:grid;place-items:center">
+            <div style="width:16px;height:12px;border-radius:3px;background:#fff"></div>
+          </div>
+          <div style="font-size:20px;font-weight:800;letter-spacing:-0.02em;color:#0A5E39">MeetRoom</div>
+        </div>
+      </sc-if>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:#EEF5F1;border-radius:12px">
+        <button onClick="{{ toSignin }}" style="height:40px;border:0;border-radius:9px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;background:{{ tabSigninBg }};color:{{ tabSigninInk }};box-shadow:{{ tabSigninShadow }}">Sign in</button>
+        <button onClick="{{ toJoin }}" style="height:40px;border:0;border-radius:9px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;background:{{ tabJoinBg }};color:{{ tabJoinInk }};box-shadow:{{ tabJoinShadow }}">Join a meeting</button>
+      </div>
+
+      <sc-if value="{{ isSignin }}" hint-placeholder-val="{{ true }}">
+        <form onSubmit="{{ submitSignin }}" noValidate="{{ true }}" style="display:flex;flex-direction:column;gap:20px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <h2 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em">Welcome back</h2>
+            <p style="margin:0;font-size:15px;color:#4B5F55">Sign in to your MeetRoom account.</p>
+          </div>
+
+          <label style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:13px;font-weight:700">Email</span>
+            <input type="email" value="{{ email }}" onChange="{{ onEmail }}" placeholder="you@company.com" autoComplete="email" style="height:48px;padding:0 14px;border:1.5px solid {{ emailBorder }};border-radius:10px;font:inherit;font-size:15px;color:#10231a;outline:none;background:#fff" style-focus="border-color:#0E7A4B;box-shadow:0 0 0 4px rgba(14,122,75,0.15)"></input>
+            <sc-if value="{{ emailError }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size:13px;color:#B42318;font-weight:600">{{ emailError }}</span>
+            </sc-if>
+          </label>
+
+          <label style="display:flex;flex-direction:column;gap:6px">
+            <span style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+              <span style="font-size:13px;font-weight:700">Password</span>
+              <a href="#forgot" style="font-size:13px">Forgot password?</a>
+            </span>
+            <span style="position:relative;display:block">
+              <input type="{{ pwType }}" value="{{ password }}" onChange="{{ onPassword }}" placeholder="Enter your password" autoComplete="current-password" style="width:100%;height:48px;padding:0 72px 0 14px;border:1.5px solid {{ pwBorder }};border-radius:10px;font:inherit;font-size:15px;color:#10231a;outline:none;background:#fff" style-focus="border-color:#0E7A4B;box-shadow:0 0 0 4px rgba(14,122,75,0.15)"></input>
+              <button type="button" onClick="{{ togglePw }}" style="position:absolute;right:6px;top:6px;height:36px;padding:0 12px;border:0;border-radius:8px;background:transparent;font:inherit;font-size:13px;font-weight:700;color:#0E7A4B;cursor:pointer" style-hover="background:#EEF5F1">{{ pwToggleLabel }}</button>
+            </span>
+            <sc-if value="{{ pwError }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size:13px;color:#B42318;font-weight:600">{{ pwError }}</span>
+            </sc-if>
+          </label>
+
+          <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;min-height:24px">
+            <input type="checkbox" checked="{{ remember }}" onChange="{{ toggleRemember }}" style="width:18px;height:18px;accent-color:#0E7A4B;margin:0"></input>
+            <span>Keep me signed in</span>
+          </label>
+
+          <button type="submit" disabled="{{ loading }}" style="height:50px;border:0;border-radius:10px;background:#0E7A4B;color:#fff;font:inherit;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px" style-hover="background:#0A5E39">
+            <sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}">{{ spinner }}</sc-if>
+            <span>{{ signinLabel }}</span>
+          </button>
+
+          <sc-if value="{{ signedIn }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:12px 14px;border-radius:10px;background:#E6F4EC;color:#0A5E39;font-size:14px;font-weight:600">Signed in. Taking you to your meetings…</div>
+          </sc-if>
+
+          <sc-if value="{{ showSSO }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;align-items:center;gap:12px;font-size:13px;color:#4B5F55">
+                <span style="flex:1;height:1px;background:#DCE6E0"></span>
+                <span>or continue with</span>
+                <span style="flex:1;height:1px;background:#DCE6E0"></span>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+                <button type="button" style="height:46px;border:1.5px solid #DCE6E0;border-radius:10px;background:#fff;font:inherit;font-size:14px;font-weight:700;color:#10231a;cursor:pointer" style-hover="border-color:#0E7A4B;background:#F5FAF7">Google</button>
+                <button type="button" style="height:46px;border:1.5px solid #DCE6E0;border-radius:10px;background:#fff;font:inherit;font-size:14px;font-weight:700;color:#10231a;cursor:pointer" style-hover="border-color:#0E7A4B;background:#F5FAF7">Microsoft</button>
+                <button type="button" style="height:46px;border:1.5px solid #DCE6E0;border-radius:10px;background:#fff;font:inherit;font-size:14px;font-weight:700;color:#10231a;cursor:pointer" style-hover="border-color:#0E7A4B;background:#F5FAF7">SSO</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <p style="margin:0;font-size:14px;color:#4B5F55;text-align:center">New to MeetRoom? <a href="#signup">Sign up free</a></p>
+        </form>
+      </sc-if>
+
+      <sc-if value="{{ isJoin }}" hint-placeholder-val="{{ false }}">
+        <form onSubmit="{{ submitJoin }}" noValidate="{{ true }}" style="display:flex;flex-direction:column;gap:20px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <h2 style="margin:0;font-size:28px;font-weight:800;letter-spacing:-0.02em">Join a meeting</h2>
+            <p style="margin:0;font-size:15px;color:#4B5F55">No account needed. Enter the ID from your invite.</p>
+          </div>
+          <label style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:13px;font-weight:700">Meeting ID or link</span>
+            <input value="{{ meetingId }}" onChange="{{ onMeetingId }}" placeholder="123 456 7890" inputMode="numeric" style="height:48px;padding:0 14px;border:1.5px solid {{ idBorder }};border-radius:10px;font:inherit;font-size:17px;letter-spacing:0.04em;color:#10231a;outline:none;background:#fff" style-focus="border-color:#0E7A4B;box-shadow:0 0 0 4px rgba(14,122,75,0.15)"></input>
+            <sc-if value="{{ idError }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size:13px;color:#B42318;font-weight:600">{{ idError }}</span>
+            </sc-if>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:13px;font-weight:700">Your name</span>
+            <input value="{{ displayName }}" onChange="{{ onName }}" placeholder="How others will see you" style="height:48px;padding:0 14px;border:1.5px solid #DCE6E0;border-radius:10px;font:inherit;font-size:15px;color:#10231a;outline:none;background:#fff" style-focus="border-color:#0E7A4B;box-shadow:0 0 0 4px rgba(14,122,75,0.15)"></input>
+          </label>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;min-height:24px">
+              <input type="checkbox" checked="{{ camOff }}" onChange="{{ toggleCam }}" style="width:18px;height:18px;accent-color:#0E7A4B;margin:0"></input>
+              <span>Turn off my video</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;min-height:24px">
+              <input type="checkbox" checked="{{ micOff }}" onChange="{{ toggleMic }}" style="width:18px;height:18px;accent-color:#0E7A4B;margin:0"></input>
+              <span>Mute my microphone</span>
+            </label>
+          </div>
+          <button type="submit" disabled="{{ loading }}" style="height:50px;border:0;border-radius:10px;background:#0E7A4B;color:#fff;font:inherit;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px" style-hover="background:#0A5E39">
+            <sc-if value="{{ loading }}" hint-placeholder-val="{{ false }}">{{ spinner }}</sc-if>
+            <span>{{ joinLabel }}</span>
+          </button>
+          <sc-if value="{{ joined }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:12px 14px;border-radius:10px;background:#E6F4EC;color:#0A5E39;font-size:14px;font-weight:600">Connecting you to meeting {{ meetingId }}…</div>
+          </sc-if>
+          <p style="margin:0;font-size:14px;color:#4B5F55;text-align:center">Hosting? <a href="#signin" onClick="{{ toSignin }}">Sign in to start a meeting</a></p>
+        </form>
+      </sc-if>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;layout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;split&quot;,&quot;centered&quot;],&quot;default&quot;:&quot;split&quot;,&quot;tsType&quot;:&quot;'split'|'centered'&quot;},&quot;brandTone&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;},&quot;showSSO&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { mode: 'signin', email: '', password: '', showPw: false, remember: true, meetingId: '', displayName: '', camOff: false, micOff: true, errors: {}, loading: false, signedIn: false, joined: false };
+  run(done) {
+    this.setState({ loading: true });
+    clearTimeout(this.t);
+    this.t = setTimeout(() => this.setState({ loading: false, [done]: true }), 1200);
+  }
+  componentDidMount() { this.iv = setInterval(() => this.setState(st => ({ slide: ((st.slide || 0) + 1) % 3 })), 5000); }
+  componentWillUnmount() { clearTimeout(this.t); clearInterval(this.iv); }
+  renderVals() {
+    const s = this.state, p = this.props;
+    const cur = s.slide || 0;
+    const slides = [
+      { title: 'Meet face to face, from anywhere.', body: 'Crystal-clear HD video for one-on-ones or rooms of 500.', placeholder: 'Drop a video call photo',
+        src: 'https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?fm=jpg&q=70&w=1600&auto=format&fit=crop', credit: 'Photo by Chris Montgomery on Unsplash', creditHref: 'https://unsplash.com/@cwmonty' },
+      { title: 'Share your screen in one click.', body: 'Present slides, demo products and annotate together in real time.', placeholder: 'Drop a screen-sharing photo',
+        src: 'https://images.unsplash.com/photo-1787647562201-113361490c83?fm=jpg&q=70&w=1600&auto=format&fit=crop', credit: 'Photo by Vitaly Gariev on Unsplash', creditHref: 'https://unsplash.com/@silverkblack' },
+      { title: 'Keep the conversation going.', body: 'Team chat, files and recordings stay with every meeting.', placeholder: 'Drop a team chat photo',
+        src: 'https://images.unsplash.com/photo-1616587894289-86480e533129?fm=jpg&q=70&w=1600&auto=format&fit=crop', credit: 'Photo by LinkedIn Sales Solutions on Unsplash', creditHref: 'https://unsplash.com/@linkedinsalesnavigator' }
+    ].map((x, i) => ({ ...x, slotId: 'mr-slide-' + (i + 1), opacity: i === cur ? 1 : 0, pe: i === cur ? 'auto' : 'none', shift: i === cur ? '0' : '8px', dotW: i === cur ? '28px' : '8px', dotO: i === cur ? 1 : 0.4,
+      go: () => { clearInterval(this.iv); this.setState({ slide: i }); this.componentDidMount(); } }));
+    const layout = p.layout ?? 'split', tone = p.brandTone ?? 'dark';
+    const split = layout === 'split', dark = tone === 'dark';
+    const signin = s.mode === 'signin';
+    const err = s.errors;
+    const on = '#fff', off = 'transparent';
+    const set = k => e => this.setState({ [k]: e.target.value, errors: { ...s.errors, [k]: null }, signedIn: false, joined: false });
+    return {
+      slides,
+      isSplit: split, isCentered: !split,
+      brandBg: dark ? '#0B5D3B' : '#E6F4EC', brandInk: dark ? '#fff' : '#0A3D27',
+      logoBg: dark ? '#fff' : '#0E7A4B', logoInk: dark ? '#0B5D3B' : '#fff',
+      brandMinH: '100vh',
+      mainBg: split ? '#fff' : '#E6F4EC',
+      cardPad: split ? '0' : '40px', cardShadow: split ? 'none' : '0 20px 50px rgba(10,61,39,0.12)',
+      isSignin: signin, isJoin: !signin,
+      tabSigninBg: signin ? on : off, tabSigninInk: signin ? '#0A5E39' : '#4B5F55', tabSigninShadow: signin ? '0 1px 3px rgba(10,61,39,0.15)' : 'none',
+      tabJoinBg: !signin ? on : off, tabJoinInk: !signin ? '#0A5E39' : '#4B5F55', tabJoinShadow: !signin ? '0 1px 3px rgba(10,61,39,0.15)' : 'none',
+      toSignin: e => { e && e.preventDefault && e.preventDefault(); this.setState({ mode: 'signin', errors: {} }); },
+      toJoin: () => this.setState({ mode: 'join', errors: {} }),
+      email: s.email, password: s.password, meetingId: s.meetingId, displayName: s.displayName,
+      onEmail: set('email'), onPassword: set('password'), onMeetingId: set('meetingId'), onName: set('displayName'),
+      pwType: s.showPw ? 'text' : 'password', pwToggleLabel: s.showPw ? 'Hide' : 'Show',
+      togglePw: () => this.setState({ showPw: !s.showPw }),
+      remember: s.remember, toggleRemember: () => this.setState({ remember: !s.remember }),
+      camOff: s.camOff, toggleCam: () => this.setState({ camOff: !s.camOff }),
+      micOff: s.micOff, toggleMic: () => this.setState({ micOff: !s.micOff }),
+      emailError: err.email, pwError: err.password, idError: err.meetingId,
+      emailBorder: err.email ? '#B42318' : '#DCE6E0', pwBorder: err.password ? '#B42318' : '#DCE6E0', idBorder: err.meetingId ? '#B42318' : '#DCE6E0',
+      showSSO: p.showSSO ?? true,
+      loading: s.loading, signedIn: s.signedIn, joined: s.joined,
+      signinLabel: s.loading ? 'Signing in…' : 'Sign in',
+      joinLabel: s.loading ? 'Joining…' : 'Join meeting',
+      spinner: React.createElement('span', { style: { width: 18, height: 18, borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.4)', borderTopColor: '#fff', animation: 'mrspin 0.8s linear infinite', display: 'inline-block' } }),
+      submitSignin: e => {
+        e.preventDefault();
+        const errors = {};
+        if (!/^\S+@\S+\.\S+$/.test(s.email)) errors.email = 'Enter a valid email address.';
+        if (s.password.length < 6) errors.password = 'Password must be at least 6 characters.';
+        this.setState({ errors });
+        if (!Object.keys(errors).length) this.run('signedIn');
+      },
+      submitJoin: e => {
+        e.preventDefault();
+        const digits = s.meetingId.replace(/\D/g, '');
+        const errors = {};
+        if (digits.length < 9 && !/^https?:\/\//.test(s.meetingId)) errors.meetingId = 'Meeting IDs are 9–11 digits.';
+        this.setState({ errors });
+        if (!Object.keys(errors).length) this.run('joined');
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

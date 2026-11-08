@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CamKnock — Home</title>
+  <link rel="icon" href="/assets/camknock-icon.png" type="image/png">
+  <meta name="theme-color" content="#0E7A4B">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      font-family: 'Manrope', system-ui, sans-serif;
+      color: #10231a;
+      -webkit-font-smoothing: antialiased;
+    }
+    * { box-sizing: border-box; }
+    a { color: #0E7A4B; text-decoration: none; font-weight: 600; }
+    a:hover { color: #0A5E39; text-decoration: underline; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { opacity: 0.7; cursor: default; }
+    .field:focus {
+      border-color: #0E7A4B !important;
+      box-shadow: 0 0 0 4px rgba(14, 122, 75, 0.15) !important;
+    }
+    .field-error { border-color: #B42318 !important; }
+    .btn-white:hover:not(:disabled) { background: #E6F4EC !important; }
+    .btn-primary:hover:not(:disabled) { background: #0A5E39 !important; }
+    .hidden { display: none !important; }
+    .err { font-size: 13px; color: #B42318; font-weight: 600; margin: 4px 0 0; }
+    @keyframes mrspin { to { transform: rotate(360deg); } }
+    .spin {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2.5px solid rgba(14, 122, 75, 0.3);
+      border-top-color: #0A5E39;
+      animation: mrspin 0.8s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .anim-in { animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .card-hover {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-3px);
+    }
+  </style>
+</head>
+<body>
+<div style="min-height:100vh;padding:12px;background:#fff;display:flex">
+  <div style="flex:1;border-radius:24px;background:#F2F8F4;display:flex;flex-direction:column;padding:20px 28px;gap:24px">
+    
+    <!-- Header -->
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:11px">
+        <img src="/assets/camknock-icon.png" width="38" height="38" alt="CamKnock" style="border-radius:10px;display:block;box-shadow:0 3px 10px rgba(14,122,75,0.2)">
+        <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;color:#0A3D27;display:flex;align-items:center">
+          Cam<span style="color:#0E7A4B">Knock</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <a href="/portal" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;background:#0E7A4B;color:#fff;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 12px rgba(14,122,75,0.25)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          Admin Portal
+        </a>
+        <div id="clock" style="font-size:13px;font-weight:600;color:#4B5F55"></div>
+        <div id="avatar" style="width:40px;height:40px;border-radius:50%;background:#0E7A4B;color:#fff;display:grid;place-items:center;font-size:14px;font-weight:800" title="Signed in user">AK</div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="anim-in" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:36px;padding:20px 0">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+        <h1 style="margin:0;font-size:48px;line-height:1.05;font-weight:800;letter-spacing:-0.035em;color:#0A3D27">Ready to meet?</h1>
+        <p style="margin:0;font-size:17px;color:#4B5F55">Start a new room or join one with a code.</p>
+      </div>
+
+      <div style="width:100%;max-width:960px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px">
+        <!-- Start a Room Card -->
+        <section class="card-hover" style="display:flex;flex-direction:column;justify-content:space-between;gap:28px;padding:36px;border-radius:24px;background:#0E7A4B;color:#fff;min-height:340px;box-shadow:0 16px 40px rgba(10,61,39,0.18)">
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div style="width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.28);display:grid;place-items:center">
+              <div style="position:relative;width:24px;height:17px;border-radius:4px;background:#fff">
+                <div style="position:absolute;right:-8px;top:4px;width:0;height:0;border-top:4.5px solid transparent;border-bottom:4.5px solid transparent;border-right:7px solid #fff"></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <h2 style="margin:0;font-size:30px;font-weight:800;letter-spacing:-0.025em">Start a Room</h2>
+              <p style="margin:0;font-size:15px;line-height:1.5">Open a new room instantly and invite people with a link.</p>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button id="camBtn" type="button" style="height:40px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.35);background:rgba(255,255,255,0.18);color:#fff;font-size:13px;font-weight:700">Video on</button>
+              <button id="micBtn" type="button" style="height:40px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.35);background:rgba(255,255,255,0.18);color:#fff;font-size:13px;font-weight:700">Mic on</button>
+            </div>
+
+            <button id="startBtn" class="btn-white" type="button" style="height:54px;border:0;border-radius:12px;background:#fff;color:#0A5E39;font-size:16px;font-weight:800">Start now</button>
+
+            <!-- Room Live Banner -->
+            <div id="roomLiveBanner" class="hidden" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:12px;background:rgba(0,0,0,0.18);font-size:14px">
+              <span>Room <strong id="liveRoomCode" style="letter-spacing:0.05em"></strong> is live</span>
+              <button id="copyLiveBtn" type="button" style="height:32px;padding:0 12px;border:0;border-radius:8px;background:rgba(255,255,255,0.2);color:#fff;font-size:13px;font-weight:700">Copy link</button>
+            </div>
+
+            <p id="homeErr" class="err" style="color:#FCA5A5"></p>
+          </div>
+        </section>
+
+        <!-- Join a Room Card -->
+        <section class="card-hover" style="display:flex;flex-direction:column;justify-content:space-between;gap:28px;padding:36px;border-radius:24px;background:#fff;min-height:340px;box-shadow:0 1px 2px rgba(10,61,39,0.06),0 12px 32px rgba(10,61,39,0.08)">
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div style="width:56px;height:56px;border-radius:16px;background:#E6F4EC;display:grid;place-items:center">
+              <div style="display:grid;grid-template-columns:repeat(2,10px);gap:4px">
+                <div style="width:10px;height:10px;border-radius:3px;background:#0E7A4B"></div>
+                <div style="width:10px;height:10px;border-radius:3px;background:#0E7A4B"></div>
+                <div style="width:10px;height:10px;border-radius:3px;background:#0E7A4B"></div>
+                <div style="width:10px;height:10px;border-radius:3px;background:#7FBF9C"></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <h2 style="margin:0;font-size:30px;font-weight:800;letter-spacing:-0.025em;color:#0A3D27">Join a Room</h2>
+              <p style="margin:0;font-size:15px;line-height:1.5;color:#4B5F55">Enter the room code or link from your invite.</p>
+            </div>
+          </div>
+
+          <form id="joinForm" novalidate style="display:flex;flex-direction:column;gap:12px">
+            <input id="joinCode" class="field" placeholder="Room code, e.g. 123 456 7890" style="height:54px;padding:0 16px;border:1.5px solid #DCE6E0;border-radius:12px;font-size:16px;letter-spacing:0.03em;color:#10231a;outline:none;background:#fff">
+            <span id="joinErr" class="err"></span>
+            <button id="joinBtn" class="btn-primary" type="submit" style="height:54px;border:0;border-radius:12px;background:#0E7A4B;color:#fff;font-size:16px;font-weight:800">Join room</button>
+          </form>
+        </section>
+      </div>
+
+      <!-- Calendar & Scheduled Meetings Section -->
+      <section style="width:100%;max-width:960px;background:#fff;border-radius:24px;padding:32px;box-shadow:0 1px 2px rgba(10,61,39,0.06),0 12px 32px rgba(10,61,39,0.08);display:flex;flex-direction:column;gap:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <h2 style="margin:0;font-size:24px;font-weight:800;color:#0A3D27;letter-spacing:-0.02em;display:flex;align-items:center;gap:10px">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0E7A4B" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Scheduled Calendar &amp; Upcoming Meetings
+            </h2>
+            <p style="margin:4px 0 0;font-size:14px;color:#4B5F55">View your booked sessions or schedule a new meeting with automated room generation.</p>
+          </div>
+          <button id="openSchedBtn" type="button" style="height:44px;padding:0 18px;border:0;border-radius:12px;background:#0E7A4B;color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Schedule Meeting
+          </button>
+        </div>
+
+        <div id="homeMeetingsList" style="display:flex;flex-direction:column;gap:10px">
+          <div style="text-align:center;padding:24px;color:#7A9185;font-size:14px">Loading your scheduled calendar…</div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Schedule Modal -->
+    <div id="homeSchedModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:999;padding:20px">
+      <div style="background:#fff;border-radius:24px;padding:32px;width:100%;max-width:480px;box-shadow:0 24px 60px rgba(10,61,39,0.25)">
+        <h3 style="margin:0 0 16px;font-size:22px;font-weight:800;color:#0A3D27">Schedule a Meeting</h3>
+        <form id="homeSchedForm" style="display:flex;flex-direction:column;gap:14px">
+          <div>
+            <label style="font-size:13px;font-weight:700;color:#0A3D27;display:block;margin-bottom:4px">Title</label>
+            <input id="hSchedTitle" required placeholder="e.g. Design Critique" class="field" style="width:100%;height:46px;padding:0 14px;border:1.5px solid #DCE6E0;border-radius:10px;font-size:14px">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div>
+              <label style="font-size:13px;font-weight:700;color:#0A3D27;display:block;margin-bottom:4px">Date</label>
+              <input type="date" id="hSchedDate" required class="field" style="width:100%;height:46px;padding:0 14px;border:1.5px solid #DCE6E0;border-radius:10px;font-size:14px">
+            </div>
+            <div>
+              <label style="font-size:13px;font-weight:700;color:#0A3D27;display:block;margin-bottom:4px">Time</label>
+              <input type="time" id="hSchedTime" required class="field" style="width:100%;height:46px;padding:0 14px;border:1.5px solid #DCE6E0;border-radius:10px;font-size:14px">
+            </div>
+          </div>
+          <div>
+            <label style="font-size:13px;font-weight:700;color:#0A3D27;display:block;margin-bottom:4px">Duration</label>
+            <select id="hSchedDuration" style="width:100%;height:46px;padding:0 14px;border:1.5px solid #DCE6E0;border-radius:10px;font-size:14px;background:#fff;outline:none">
+              <option value="15">15 Minutes</option>
+              <option value="30" selected>30 Minutes</option>
+              <option value="45">45 Minutes</option>
+              <option value="60">60 Minutes</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:8px">
+            <button type="button" onclick="document.getElementById('homeSchedModal').classList.add('hidden')" style="background:transparent;border:0;color:#4B5F55;font-weight:700;cursor:pointer">Cancel</button>
+            <button type="submit" class="btn-primary" style="height:46px;padding:0 20px;border:0;border-radius:10px;background:#0E7A4B;color:#fff;font-weight:800;cursor:pointer">Save &amp; Generate Link</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px 4px;border-top:1px solid #DCE6E0;margin-top:8px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <img src="/assets/camknock-icon.png" width="22" height="22" alt="CamKnock" style="border-radius:6px;display:block">
+        <span style="font-size:13px;color:#4B5F55;font-weight:500">© 2026 CamKnock. All rights reserved.</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <a href="/privacy" style="font-size:13px;color:#4B5F55;font-weight:600;text-decoration:none">Privacy</a>
+        <a href="/terms" style="font-size:13px;color:#4B5F55;font-weight:600;text-decoration:none">Terms</a>
+        <a href="/help" style="font-size:13px;color:#4B5F55;font-weight:600;text-decoration:none">Help</a>
+        <a href="/" id="signOut" style="font-size:13px;color:#DC2626;font-weight:700;text-decoration:none">Sign out</a>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<script src="/js/core.js?v=15"></script>
+<script src="/js/home.js?v=15"></script>
+</body>
+</html>

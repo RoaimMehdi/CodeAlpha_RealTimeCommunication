@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CamKnock • Admin Operations Portal</title>
+  <link rel="icon" href="/assets/camknock-icon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/portal/portal.css?v=20261108_admin">
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    /* Hash Page Specific Extensions */
+    .page-section { display: none; }
+    .page-section.active { display: block; animation: fadeIn 0.25s ease; }
+
+    /* Switch toggle styles */
+    .switch-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: #06170E;
+      border: 1px solid rgba(74, 222, 128, 0.2);
+      border-radius: 12px;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.15s;
+    }
+    .switch-label:hover { border-color: rgba(74, 222, 128, 0.45); }
+    .switch-input { display: none; }
+    .switch-slider {
+      width: 44px; height: 24px;
+      background: #1C3325;
+      border-radius: 999px;
+      position: relative;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .switch-slider::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #A7BDB1;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .switch-input:checked + .switch-slider { background: #0E7A4B; }
+    .switch-input:checked + .switch-slider::after {
+      transform: translateX(20px);
+      background: #4ADE80;
+    }
+
+    /* Calendar Grid */
+    .cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+    .cal-day-name {
+      text-align: center;
+      padding: 8px 4px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #8CA395;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .cal-cell {
+      min-height: 80px;
+      background: #06170E;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      position: relative;
+    }
+    .cal-cell:hover {
+      border-color: rgba(74, 222, 128, 0.4);
+      background: #092014;
+    }
+    .cal-cell.today {
+      border-color: #4ADE80;
+      box-shadow: 0 0 10px rgba(74, 222, 128, 0.2) inset;
+    }
+    .cal-cell.selected {
+      border-color: #4ADE80;
+      background: rgba(14, 122, 75, 0.2);
+    }
+    .cal-cell.other-month {
+      opacity: 0.3;
+    }
+    .cal-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: #CFE3D7;
+    }
+    .cal-dots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .cal-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #4ADE80;
+    }
+    .cal-count-pill {
+      font-size: 10px;
+      font-weight: 800;
+      background: rgba(74, 222, 128, 0.2);
+      color: #4ADE80;
+      border-radius: 4px;
+      padding: 2px 5px;
+      margin-top: 4px;
+      display: inline-block;
+    }
+
+    /* Ticket Message Thread */
+    .thread-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 360px;
+      overflow-y: auto;
+      padding: 16px;
+      background: #06170E;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .msg-bubble {
+      max-width: 80%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.45;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .msg-user {
+      align-self: flex-start;
+      background: #0E2919;
+      border: 1px solid rgba(74, 222, 128, 0.2);
+      color: #E2ECE6;
+    }
+    .msg-admin {
+      align-self: flex-end;
+      background: #0E7A4B;
+      color: #fff;
+    }
+    .msg-meta {
+      font-size: 10px;
+      opacity: 0.7;
+    }
+
+    /* Floating Toast */
+    #toastContainer {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 9999;
+      pointer-events: none;
+    }
+    .toast-item {
+      pointer-events: auto;
+      background: #0D2217;
+      border: 1px solid rgba(74, 222, 128, 0.4);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: toastIn 0.25s ease forwards;
+    }
+    .toast-item.error {
+      border-color: #EF4444;
+      background: #240C0C;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Mobile toggle */
+    .mobile-menu-btn {
+      display: none;
+      background: transparent;
+      border: 0;
+      color: #fff;
+      cursor: pointer;
+    }
+    @media (max-width: 768px) {
+      .mobile-menu-btn { display: block; }
+      .portal-sidebar {
+        position: fixed;
+        left: -280px;
+        z-index: 999;
+        transition: left 0.25s ease;
+      }
+      .portal-sidebar.open { left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Toasts Container -->
+  <div id="toastContainer"></div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmModal" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width: 420px">
+      <h3 style="font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 8px" id="confirmTitle">Confirm Action</h3>
+      <p style="font-size: 13.5px; color: #A7BDB1; line-height: 1.5; margin-bottom: 20px" id="confirmMsg">Are you sure you want to proceed?</p>
+      <div style="display: flex; justify-content: flex-end; gap: 10px">
+        <button type="button" class="portal-btn secondary" onclick="closeConfirmModal()">Cancel</button>
+        <button type="button" class="portal-btn danger" id="confirmOkBtn">Yes, Proceed</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="portal-sidebar" id="portalSidebar">
+    <a href="/" class="portal-brand">
+      <img src="/assets/camknock-icon.png" width="36" height="36" alt="CamKnock" style="border-radius: 8px; box-shadow: 0 3px 10px rgba(14,122,75,0.4)">
+      <div>
+        <div style="font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.02em">Cam<span style="color: #4ADE80">Knock</span></div>
+        <div style="font-size: 10.5px; font-weight: 700; color: #617A6D; letter-spacing: 0.05em">ADMIN OPERATIONS PORTAL</div>
+      </div>
+    </a>
+
+    <nav class="portal-nav">
+      <!-- 1. Overview -->
+      <a href="#overview" class="nav-btn" data-hash="overview">
+        <span class="nav-btn-inner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          Overview Dashboard
+        </span>
+      </a>
+
+      <!-- 2. Live Calls Monitor -->
+      <a href="#live" class="nav-btn" data-hash="live">
+        <span class="nav-btn-inner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="#EF4444"/></svg>
+          Live Calls Monitor
+        </span>
+        <span id="liveBadge" class="nav-pill live">0 LIVE</span>
+      </a>
+
+      <!-- 3. Hosts & Users -->
+      <a href="#users" class="nav-btn" data-hash="users">
+        <span class="nav-btn-inner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Hosts &amp; Users
+        </span>
+      </a>
+
+      <!-- 4. Meetings & History -->
+      <a href="#meetings" class="nav-btn" data-hash="meetings">
+        <span class="nav-btn-inner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          Meetings &amp; History
+        </span>
+      </a>
+
+      <!-- 5. Scheduled Calendar -->
+      <a href="#calendar" class="nav-btn" data-hash="calendar">
+        <span class="nav-btn-inner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Scheduled Calendar
+        </span>
+      </a>
+
+      <!-- 6. Support Desk -->
+      <a href="#support" class="nav-btn" data-hash="support">
+        <span class="nav-btn-inner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Support Desk
+        </span>
+        <span id="supportBadge" class="nav-pill">0</span>
+      </a>
+
+      <!-- 7. Website Controls -->
+      <a href="#controls" class="nav-btn" data-hash="controls">
+        <span class="nav-btn-inner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Website Controls
+        </span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div style="font-size: 12px; color: #8CA395; display: flex; align-items: center; gap: 6px">
+        <span style="width: 7px; height: 7px; border-radius: 50%; background: #4ADE80; box-shadow: 0 0 8px #4ADE80; flex-shrink: 0"></span>
+        MySQL 8.0 Live Connected
+      </div>
+      <div style="font-size: 11px; color: #617A6D">
+        <a href="tel:+12016852107" style="color: #617A6D; text-decoration: none">+1 201-685-2107</a>
+      </div>
+      <a href="/" style="font-size: 12px; color: #4ADE80; font-weight: 700; text-decoration: none">&larr; Back to Public Site</a>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEW -->
+  <main class="portal-main">
+    <header class="portal-header">
+      <div style="display: flex; align-items: center; gap: 14px">
+        <button class="mobile-menu-btn" onclick="document.getElementById('portalSidebar').classList.toggle('open')">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <h1 style="font-size: 19px; font-weight: 800; color: #fff" id="portalHeaderTitle">Executive Overview</h1>
+        <span id="roleIndicator" class="role-badge role-admin">ADMIN ONLY</span>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 16px">
+        <div id="liveClock" class="mono" style="font-size: 13px; font-weight: 700; color: #8CA395"></div>
+        <div style="display: flex; align-items: center; gap: 10px">
+          <div id="adminAvatar" style="width: 36px; height: 36px; border-radius: 50%; background: #0E7A4B; display: grid; place-items: center; font-size: 13px; font-weight: 800; color: #fff">AD</div>
+          <button onclick="adminSignOut()" style="background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #FCA5A5; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer">Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="portal-content">
+
+      <!-- ============================================================== -->
+      <!-- PAGE 1: OVERVIEW DASHBOARD (#overview)                        -->
+      <!-- ============================================================== -->
+      <section id="page-overview" class="page-section">
+        <!-- 6 Stat Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-title">Total Users</span>
+            <span class="stat-value" id="statUsers"><span class="spinner"></span></span>
+            <span class="stat-sub">Registered accounts</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-title">Active Hosts</span>
+            <span class="stat-value" id="statHosts"><span class="spinner"></span></span>
+            <span class="stat-sub">&gt;= 1 meeting hosted</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-title">Total Meetings</span>
+            <span class="stat-value" id="statMeetings"><span class="spinner"></span></span>
+            <span class="stat-sub">All-time sessions</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-title">Participants Joined</span>
+            <span class="stat-value" id="statJoins"><span class="spinner"></span></span>
+            <span class="stat-sub">count(joins) records</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-title">Live Calls Now</span>
+            <span class="stat-value text-green" id="statLive"><span class="spinner"></span></span>
+            <span class="stat-sub">Connected WebRTC mesh</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-title">Support Tickets</span>
+            <span class="stat-value" id="statTickets"><span class="spinner"></span></span>
+            <span class="stat-sub">Helpline inquiries</span>
+          </div>
+        </div>
+
+        <!-- Host Breakdown Table -->
+        <div class="portal-section-card" style="margin-top: 24px">
+          <div class="section-head">
+            <div>
+              <div class="section-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                Host Performance &amp; Attendance Breakdown
+              </div>
+              <p style="font-size: 13px; color: #8CA395; margin-top: 3px">Name, email, role, rooms created, participants joined via their codes, last meeting date.</p>
+            </div>
+            <button class="portal-btn" onclick="loadOverviewData()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+              Refresh
+            </button>
+          </div>
+          <div style="overflow-x: auto">
+            <table class="portal-table">
+              <thead><tr>
+                <th>Host Name</th><th>Email</th><th>Role</th><th>Status</th>
+                <th>Rooms Created</th><th>Participants Joined</th><th>Last Meeting</th>
+              </tr></thead>
+              <tbody id="overviewHostsBody">
+                <tr><td colspan="7" style="text-align: center; padding: 28px; color: #8CA395"><span class="spinner"></span> Loading real MySQL metrics...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- PAGE 2: LIVE CALLS MONITOR (#live)                            -->
+      <!-- ============================================================== -->
+      <section id="page-live" class="page-section">
+        <div class="portal-section-card">
+          <div class="section-head">
+            <div>
+              <div class="section-title" style="color: #EF4444">
+                <span style="display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #EF4444; box-shadow: 0 0 10px #EF4444; animation: pulseRed 1.5s infinite"></span>
+                Real-Time WebRTC Live Calls Monitor
+              </div>
+              <p style="font-size: 13px; color: #8CA395; margin-top: 3px">Live list from the WebRTC signaling server. Admin can force terminate active calls.</p>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center">
+              <span id="liveScanStatus" style="font-size: 12px; color: #8CA395"></span>
+              <button class="portal-btn" onclick="loadLiveCalls()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/></svg>
+                Scan Now
+              </button>
+            </div>
+          </div>
+          <div style="overflow-x: auto">
+            <table class="portal-table">
+              <thead><tr>
+                <th>Room Code</th><th>Title</th><th>Host</th><th>Participants</th><th>Started At</th><th>Support Operations</th>
+              </tr></thead>
+              <tbody id="liveCallsBody">
+                <tr><td colspan="6" style="text-align: center; padding: 32px; color: #8CA395"><span class="spinner"></span> Scanning live calls from WebRTC mesh...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- PAGE 3: HOSTS & USERS (#users)                                -->
+      <!-- ============================================================== -->
+      <section id="page-users" class="page-section">
+        <div class="portal-section-card">
+          <div class="section-head">
+            <div>
+              <div class="section-title">Hosts &amp; Users Directory</div>
+              <p style="font-size: 13px; color: #8CA395; margin-top: 2px">Search, role filter, add user, change role, suspend/activate, delete (also deletes their meetings).</p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap">
+              <input type="text" id="userSearchInput" class="portal-search" style="width: 190px" placeholder="Search name/email..." oninput="debounceUserSearch()">
+              <select id="userRoleFilter" class="portal-select" onchange="loadUsers()">
+                <option value="all">All Roles</option>
+                <option value="admin">Admins</option>
+                <option value="user">Users / Hosts</option>
+              </select>
+              <button class="portal-btn" onclick="openAddUserModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add User
+              </button>
+            </div>
+          </div>
+          <div style="overflow-x: auto">
+            <table class="portal-table">
+              <thead><tr>
+                <th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Meetings Hosted</th><th>Created</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="usersTableBody">
+                <tr><td colspan="8" style="text-align: center; padding: 28px; color: #8CA395"><span class="spinner"></span> Loading users from MySQL...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- PAGE 4: MEETINGS & HISTORY (#meetings)                        -->
+      <!-- ============================================================== -->
+      <section id="page-meetings" class="page-section">
+        <div class="portal-section-card">
+          <div class="section-head">
+            <div>
+              <div class="section-title">Meetings &amp; History</div>
+              <p style="font-size: 13px; color: #8CA395; margin-top: 2px">Complete database of all sessions. Search, filter by status, and manage records.</p>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap">
+              <input type="text" id="meetingSearchInput" class="portal-search" style="width: 190px" placeholder="Search code/title/host..." oninput="debounceMeetingSearch()">
+              <select id="meetingStatusFilter" class="portal-select" onchange="loadMeetings()">
+                <option value="all">All Statuses</option>
+                <option value="live">Live Calls</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="completed">Completed</option>
+              </select>
+              <button class="portal-btn" onclick="openCreateMeetingModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Schedule Session
+              </button>
+            </div>
+          </div>
+          <div style="overflow-x: auto">
+            <table class="portal-table">
+              <thead><tr>
+                <th>Code</th><th>Title</th><th>Host</th><th>Date &amp; Time</th><th>Joined Count</th><th>Duration</th><th>Status</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="meetingsTableBody">
+                <tr><td colspan="8" style="text-align: center; padding: 28px; color: #8CA395"><span class="spinner"></span> Loading meetings from MySQL...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- PAGE 5: SCHEDULED CALENDAR (#calendar)                        -->
+      <!-- ============================================================== -->
+      <section id="page-calendar" class="page-section">
+        <div class="portal-section-card">
+          <div class="section-head">
+            <div>
+              <div class="section-title">Scheduled Calendar (Month Grid)</div>
+              <p style="font-size: 13px; color: #8CA395; margin-top: 2px">Month grid view with meeting dots. Click any date to view scheduled sessions.</p>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center">
+              <button class="portal-btn secondary" onclick="changeMonth(-1)">&larr; Prev</button>
+              <span id="calCurrentMonthLabel" style="font-size: 15px; font-weight: 800; color: #fff; min-width: 140px; text-align: center"></span>
+              <button class="portal-btn secondary" onclick="changeMonth(1)">Next &rarr;</button>
+              <button class="portal-btn" style="margin-left: 8px" onclick="openCreateMeetingModal()">+ Schedule Meeting</button>
+            </div>
+          </div>
+
+          <div style="padding: 24px">
+            <!-- Day of week headers -->
+            <div class="cal-grid" style="margin-bottom: 8px">
+              <div class="cal-day-name">Sun</div><div class="cal-day-name">Mon</div>
+              <div class="cal-day-name">Tue</div><div class="cal-day-name">Wed</div>
+              <div class="cal-day-name">Thu</div><div class="cal-day-name">Fri</div>
+              <div class="cal-day-name">Sat</div>
+            </div>
+            <!-- Calendar Cells -->
+            <div class="cal-grid" id="calendarDaysGrid"></div>
+
+            <!-- Selected Date Meeting List Sub-Panel -->
+            <div id="selectedDayPanel" style="margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); display: none">
+              <h3 style="font-size: 16px; font-weight: 800; color: #4ADE80; margin-bottom: 12px" id="selectedDayHeading">Scheduled Meetings</h3>
+              <div id="selectedDayList" style="display: flex; flex-direction: column; gap: 10px"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- PAGE 6: SUPPORT DESK (#support)                               -->
+      <!-- ============================================================== -->
+      <section id="page-support" class="page-section">
+        <div class="portal-section-card">
+          <div class="section-head">
+            <div>
+              <div class="section-title">Support Desk &amp; Helpline Center</div>
+              <p style="font-size: 13px; color: #8CA395; margin-top: 2px">Customer inquiries, threaded message history, status resolution, and helpline management.</p>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center">
+              <select id="ticketStatusFilter" class="portal-select" onchange="loadTickets()">
+                <option value="all">All Statuses</option>
+                <option value="open">Open</option>
+                <option value="progress">In Progress</option>
+                <option value="resolved">Resolved</option>
+              </select>
+              <button class="portal-btn" onclick="loadTickets()">Refresh</button>
+            </div>
+          </div>
+          <div style="overflow-x: auto">
+            <table class="portal-table">
+              <thead><tr>
+                <th>ID</th><th>User Email</th><th>Subject</th><th>Latest Message</th><th>Status</th><th>Created</th><th>Action</th>
+              </tr></thead>
+              <tbody id="ticketsTableBody">
+                <tr><td colspan="7" style="text-align: center; padding: 28px; color: #8CA395"><span class="spinner"></span> Loading support tickets...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- PAGE 7: WEBSITE CONTROLS (#controls)                          -->
+      <!-- ============================================================== -->
+      <section id="page-controls" class="page-section">
+        <div class="portal-section-card">
+          <div class="section-head">
+            <div>
+              <div class="section-title">Website Settings &amp; Policy Controls</div>
+              <p style="font-size: 13px; color: #8CA395; margin-top: 2px">Control live parameters saved to MySQL `settings`. Public site and signalling enforce these settings.</p>
+            </div>
+            <button class="portal-btn" id="saveControlsBtn" onclick="saveControls()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save Live Settings
+            </button>
+          </div>
+
+          <div style="padding: 28px; display: flex; flex-direction: column; gap: 24px; max-width: 760px">
+            <!-- Toggles -->
+            <div style="display: flex; flex-direction: column; gap: 12px">
+              <label class="switch-label">
+                <div>
+                  <div style="font-size: 14px; font-weight: 700; color: #fff">1-Click Instant Guest Join</div>
+                  <div style="font-size: 12px; color: #8CA395">When OFF, all participants must create an account and sign in before joining calls.</div>
+                </div>
+                <input type="checkbox" id="ctrl_guest_join" class="switch-input">
+                <span class="switch-slider"></span>
+              </label>
+
+              <label class="switch-label">
+                <div>
+                  <div style="font-size: 14px; font-weight: 700; color: #fff">Host Login &amp; Account Sign-In</div>
+                  <div style="font-size: 12px; color: #8CA395">Allows registered users and hosts to log in. Admins can always sign in regardless.</div>
+                </div>
+                <input type="checkbox" id="ctrl_host_login" class="switch-input" checked>
+                <span class="switch-slider"></span>
+              </label>
+
+              <label class="switch-label">
+                <div>
+                  <div style="font-size: 14px; font-weight: 700; color: #fff">WebRTC Screen Share</div>
+                  <div style="font-size: 12px; color: #8CA395">Enable or disable desktop/tab screen broadcasting inside video rooms.</div>
+                </div>
+                <input type="checkbox" id="ctrl_screen_share" class="switch-input" checked>
+                <span class="switch-slider"></span>
+              </label>
+
+              <label class="switch-label">
+                <div>
+                  <div style="font-size: 14px; font-weight: 700; color: #fff">In-Meeting Text Chat</div>
+                  <div style="font-size: 12px; color: #8CA395">Allow participants to send text messages and files during meetings.</div>
+                </div>
+                <input type="checkbox" id="ctrl_chat" class="switch-input" checked>
+                <span class="switch-slider"></span>
+              </label>
+
+              <label class="switch-label" style="border-color: rgba(239, 68, 68, 0.3)">
+                <div>
+                  <div style="font-size: 14px; font-weight: 700; color: #F87171">System Maintenance Mode</div>
+                  <div style="font-size: 12px; color: #8CA395">When ON, displays maintenance banner on public site and prevents new meeting joins.</div>
+                </div>
+                <input type="checkbox" id="ctrl_maintenance" class="switch-input">
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <!-- Numbers -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+              <div>
+                <label style="font-size: 12px; font-weight: 700; color: #A7BDB1; display: block; margin-bottom: 6px">Max Participants Per Room</label>
+                <input type="number" id="ctrl_max_participants" class="portal-search" style="width: 100%" min="2" max="100" value="25">
+                <span style="font-size: 11px; color: #617A6D">Enforced by signalling server (max 100).</span>
+              </div>
+              <div>
+                <label style="font-size: 12px; font-weight: 700; color: #A7BDB1; display: block; margin-bottom: 6px">Max Meeting Duration (Minutes)</label>
+                <input type="number" id="ctrl_max_minutes" class="portal-search" style="width: 100%" min="10" max="600" value="60">
+                <span style="font-size: 11px; color: #617A6D">Maximum active duration per session.</span>
+              </div>
+            </div>
+
+            <!-- Banner Text -->
+            <div>
+              <label style="font-size: 12px; font-weight: 700; color: #A7BDB1; display: block; margin-bottom: 6px">Public Top Announcement Banner</label>
+              <textarea id="ctrl_banner" rows="3" class="portal-search" style="width: 100%; resize: vertical" placeholder="Text displayed on the homepage announcement bar..."></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /portal-content -->
+  </main>
+
+  <!-- ================================================================ -->
+  <!-- MODALS                                                           -->
+  <!-- ================================================================ -->
+
+  <!-- Add User Modal -->
+  <div id="addUserModal" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width: 440px">
+      <h3 style="font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 16px">Create User / Host</h3>
+      <form id="addUserForm" onsubmit="submitAddUser(event)" style="display: flex; flex-direction: column; gap: 14px">
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: #A7BDB1; display: block; margin-bottom: 4px">Full Name</label>
+          <input id="newUserName" required placeholder="Jane Doe" class="portal-search" style="width: 100%">
+        </div>
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: #A7BDB1; display: block; margin-bottom: 4px">Email Address</label>
+          <input type="email" id="newUserEmail" required placeholder="jane@company.com" class="portal-search" style="width: 100%">
+        </div>
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: #A7BDB1; display: block; margin-bottom: 4px">Password</label>
+          <input type="password" id="newUserPassword" required value="password123" class="portal-search" style="width: 100%">
+        </div>
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: #A7BDB1; display: block; margin-bottom: 4px">Role</label>
+          <select id="newUserRole" class="portal-select" style="width: 100%; padding: 10px">
+            <option value="user">User / Host (Standard)</option>
+            <option value="admin">Administrator (Full Access)</option>
+          </select>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px">
+          <button type="button" class="portal-btn secondary" onclick="document.getElementById('addUserModal').classList.add('hidden')">Cancel</button>
+          <button type="submit" class="portal-btn">Create Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Create / Schedule Meeting Modal -->
+  <div id="createMeetingModal" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width: 480px">
+      <h3 style="font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 16px">Schedule Meeting Session</h3>
+      <form id="createMeetingForm" onsubmit="submitCreateMeeting(event)" style="display: flex; flex-direction: column; gap: 14px">
+        <div>
+          <label style="font-size: 12px; font-weight: 700; color: #A7BDB1; display: block; margin-bottom: 4px">Meeting Title</label>
+          <input id="meetTitle" required placeholder="e.g. Q4 Strategy Review" class="portal-search" style="width: 100%">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+          <div>
+            <label style="font-size: 12px; font-weight: 700; color: #A7BDB1; display: block; margin-bottom: 4px">Date</label>
+            <input type="date" id="meetDate" required class="portal-search" style="width: 100%">
+          </div>
+          <div>
+            <label style="font-size: 12px; font-weight: 700; color: #A7BDB1; display: block; margin-bottom: 4px">Time</label>
+            <input type="time" id="meetTime" required class="portal-search" style="width: 100%" value="10:00">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+          <div>
+            <label style="font-size: 12px; font-weight: 700; color: #A7BDB1; display: block; margin-bottom: 4px">Duration (Mins)</label>
+            <select id="meetDuration" class="portal-select" style="width: 100%; padding: 10px">
+              <option value="15">15 Minutes</option>
+              <option value="30" selected>30 Minutes</option>
+              <option value="45">45 Minutes</option>
+              <option value="60">60 Minutes</option>
+              <option value="90">90 Minutes</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 12px; font-weight: 700; color: #A7BDB1; display: block; margin-bottom: 4px">Status</label>
+            <select id="meetStatus" class="portal-select" style="width: 100%; padding: 10px">
+              <option value="scheduled">Scheduled</option>
+              <option value="live">Live Now</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px">
+          <button type="button" class="portal-btn secondary" onclick="document.getElementById('createMeetingModal').classList.add('hidden')">Cancel</button>
+          <button type="submit" class="portal-btn">Save Session</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Ticket Thread Dialog Modal -->
+  <div id="ticketThreadModal" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width: 640px; max-height: 85vh; display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px">
+        <div>
+          <h3 style="font-size: 18px; font-weight: 800; color: #fff" id="tDialogSubject">Support Ticket</h3>
+          <div style="font-size: 12px; color: #A7BDB1; margin-top: 2px">
+            From: <strong style="color: #4ADE80" id="tDialogEmail"></strong> • <span id="tDialogDate"></span>
+          </div>
+        </div>
+        <button onclick="document.getElementById('ticketThreadModal').classList.add('hidden')" style="background: transparent; border: 0; color: #A7BDB1; font-size: 24px; cursor: pointer">&times;</button>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: #06170E; border-radius: 10px; border: 1px solid rgba(255,255,255,0.06)">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <label style="font-size: 12px; font-weight: 700; color: #8CA395">Status:</label>
+          <select id="tDialogStatusSelect" class="portal-select" onchange="updateTicketStatusFromDialog(this.value)">
+            <option value="open">Open</option>
+            <option value="progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+          </select>
+        </div>
+        <button type="button" class="portal-btn danger" style="padding: 5px 12px; font-size: 11px" onclick="deleteTicketFromDialog()">Delete Ticket</button>
+      </div>
+
+      <!-- Messages Thread -->
+      <div class="thread-box" id="ticketMessagesContainer"></div>
+
+      <!-- Reply Box -->
+      <form id="ticketReplyForm" onsubmit="submitTicketReply(event)" style="display: flex; gap: 8px">
+        <input type="text" id="ticketReplyText" required placeholder="Type an official admin reply..." class="portal-search" style="flex: 1">
+        <button type="submit" class="portal-btn" id="sendReplyBtn">
+          Reply &rarr;
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/portal/portal.js?v=20261108_admin"></script>
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hosts &amp; Users — CamKnock Portal</title>
+  <link rel="icon" href="/assets/camknock-icon.png" type="image/png">
+  <link rel="stylesheet" href="/portal/portal.css?v=20261108">
+</head>
+<body>
+
+  <aside class="portal-sidebar">
+    <a href="/" class="portal-brand">
+      <img src="/assets/camknock-icon.png" width="36" height="36" alt="CamKnock" style="border-radius:8px;box-shadow:0 3px 10px rgba(14,122,75,0.4)">
+      <div>
+        <div style="font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.02em">Cam<span style="color:#4ADE80">Knock</span></div>
+        <div style="font-size:11px;font-weight:700;color:#617A6D;letter-spacing:0.04em">OPERATIONS &amp; SUPPORT</div>
+      </div>
+    </a>
+    <nav class="portal-nav">
+      <a href="/portal" class="nav-btn"><span class="nav-btn-inner"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Overview Dashboard</span></a>
+      <a href="/portal/live-calls" class="nav-btn"><span class="nav-btn-inner"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="#EF4444"/></svg>Live Calls Monitor</span><span id="livePill" class="nav-pill live">0 LIVE</span></a>
+      <a href="/portal/users" class="nav-btn active"><span class="nav-btn-inner"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Hosts &amp; Users</span></a>
+      <a href="/portal/meetings" class="nav-btn"><span class="nav-btn-inner"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Meetings &amp; History</span></a>
+      <a href="/portal/calendar" class="nav-btn"><span class="nav-btn-inner"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Scheduled Calendar</span></a>
+      <a href="/portal/support" class="nav-btn"><span class="nav-btn-inner"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Support Desk</span></a>
+      <a href="/portal/settings" class="nav-btn"><span class="nav-btn-inner"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Website Controls</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div style="font-size:12px;color:#8CA395;display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:50%;background:#4ADE80;box-shadow:0 0 8px #4ADE80;flex-shrink:0"></span>MySQL 8.0 Live Connected</div>
+      <div style="font-size:11px;color:#617A6D"><a href="tel:+12016852107" style="color:#617A6D;text-decoration:none">+1 201-685-2107</a></div>
+      <a href="/" style="font-size:12px;color:#4ADE80;font-weight:700;text-decoration:none">Back to CamKnock &rarr;</a>
+    </div>
+  </aside>
+
+  <main class="portal-main">
+    <header class="portal-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <h1 style="font-size:20px;font-weight:800;color:#fff">User &amp; Host Directory</h1>
+        <span id="roleIndicator" class="role-badge role-admin">ADMIN PORTAL</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <div id="liveClock" class="mono" style="font-size:13px;font-weight:700;color:#8CA395"></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div id="userAvatar" style="width:36px;height:36px;border-radius:50%;background:#0E7A4B;display:grid;place-items:center;font-size:13px;font-weight:800;color:#fff">AD</div>
+          <button onclick="portalSignOut()" style="background:transparent;border:1px solid rgba(255,255,255,0.15);color:#FCA5A5;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="portal-content">
+      <div class="portal-section-card">
+        <div class="section-head">
+          <div>
+            <div class="section-title">User &amp; Host Management (A to Z)</div>
+            <p style="font-size:13px;color:#8CA395;margin-top:2px">Manage accounts, assign roles (Admin, Support, Host, User), reset passwords, and create new users.</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <input type="text" id="userSearch" class="portal-search" style="width:190px" placeholder="Search name or email..." oninput="filterUsers()">
+            <select id="roleFilter" class="portal-select" onchange="filterUsers()">
+              <option value="all">All Roles</option>
+              <option value="admin">Admins</option>
+              <option value="support">Support Team</option>
+              <option value="host">Hosts</option>
+              <option value="user">Users</option>
+            </select>
+            <button class="portal-btn" onclick="document.getElementById('addUserModal').classList.remove('hidden')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add User
+            </button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="portal-table">
+            <thead><tr>
+              <th>ID</th><th>Name</th><th>Email</th><th>Role</th>
+              <th>Joined</th><th>Change Role</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="usersBody">
+              <tr><td colspan="7" style="text-align:center;padding:28px;color:#8CA395"><span class="spinner"></span> Loading users from MySQL...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add User Modal -->
+  <div id="addUserModal" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width:460px">
+      <h3 style="font-size:20px;font-weight:800;color:#fff;margin-bottom:16px">Add New User or Host</h3>
+      <form id="addUserForm" style="display:flex;flex-direction:column;gap:14px" onsubmit="submitAddUser(event)">
+        <div>
+          <label style="font-size:12px;font-weight:700;color:#A7BDB1;display:block;margin-bottom:4px">Full Name</label>
+          <input id="newName" required placeholder="e.g. John Doe" class="portal-search" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:#A7BDB1;display:block;margin-bottom:4px">Email</label>
+          <input type="email" id="newEmail" required placeholder="john@company.com" class="portal-search" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:#A7BDB1;display:block;margin-bottom:4px">Initial Password</label>
+          <input type="password" id="newPassword" required value="camknock123" class="portal-search" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:#A7BDB1;display:block;margin-bottom:4px">Role</label>
+          <select id="newRole" class="portal-select" style="width:100%;padding:10px">
+            <option value="host">Host</option>
+            <option value="support">Support Team</option>
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
+          </select>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:6px">
+          <button type="button" onclick="document.getElementById('addUserModal').classList.add('hidden')" style="background:transparent;border:0;color:#A7BDB1;font-size:13px;font-weight:700;cursor:pointer">Cancel</button>
+          <button type="submit" class="portal-btn">Create User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/portal/shared.js?v=20261108"></script>
+  <script>
+    let allUsers = [];
+
+    async function loadUsers() {
+      await ensurePortalSession();
+      try {
+        const res = await fetch('/api/portal/stats', { headers: getAuthHeaders() });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        allUsers = Array.isArray(data.recent_users) ? data.recent_users : [];
+        renderUsers(allUsers);
+      } catch (e) {
+        document.getElementById('usersBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:#FCA5A5">Error: ' + e.message + '</td></tr>';
+      }
+    }
+
+    function renderUsers(users) {
+      const tbody = document.getElementById('usersBody');
+      if (!users.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:#8CA395">No users found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = users.map(u => {
+        const dt = u.created_at ? new Date(u.created_at).toLocaleDateString() : '—';
+        return `<tr class="fade-in" id="user-row-${u.id}">
+          <td class="mono" style="color:#8CA395">#${u.id}</td>
+          <td style="font-weight:700;color:#fff">${escapeHtml(u.name||'—')}</td>
+          <td style="color:#A7BDB1">${escapeHtml(u.email||'')}</td>
+          <td><span class="role-badge role-${u.role||'user'}">${(u.role||'user').toUpperCase()}</span></td>
+          <td style="color:#8CA395">${dt}</td>
+          <td>
+            <select class="portal-select" onchange="changeRole(${u.id}, this.value)">
+              <option value="user" ${u.role==='user'?'selected':''}>User</option>
+              <option value="host" ${u.role==='host'?'selected':''}>Host</option>
+              <option value="support" ${u.role==='support'?'selected':''}>Support</option>
+              <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
+            </select>
+          </td>
+          <td>
+            <div style="display:flex;gap:6px">
+              <button onclick="resetPassword(${u.id})" class="portal-btn secondary" style="padding:4px 10px;font-size:11px">Reset PW</button>
+              <button onclick="deleteUser(${u.id},'${escapeHtml(u.name||'')}',this)" class="portal-btn danger" style="padding:4px 10px;font-size:11px">Delete</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function filterUsers() {
+      const q = document.getElementById('userSearch').value.toLowerCase();
+      const r = document.getElementById('roleFilter').value;
+      const filtered = allUsers.filter(u => {
+        const matchQ = !q || (u.name||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q);
+        const matchR = r === 'all' || u.role === r;
+        return matchQ && matchR;
+      });
+      renderUsers(filtered);
+    }
+
+    async function changeRole(id, role) {
+      try {
+        const res = await fetch('/api/portal/users/' + id + '/role', {
+          method: 'PATCH',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ role })
+        });
+        if (!res.ok) throw new Error('Failed');
+        // Update local cache
+        const u = allUsers.find(x => x.id === id);
+        if (u) u.role = role;
+        const badge = document.querySelector('#user-row-' + id + ' .role-badge');
+        if (badge) {
+          badge.textContent = role.toUpperCase();
+          badge.className = 'role-badge role-' + role;
+        }
+      } catch (e) {
+        alert('Could not update role: ' + e.message);
+      }
+    }
+
+    async function resetPassword(id) {
+      const pw = prompt('Enter new password for user #' + id + ':');
+      if (!pw) return;
+      try {
+        const res = await fetch('/api/portal/users/' + id + '/password', {
+          method: 'PATCH',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ password: pw })
+        });
+        if (res.ok) alert('Password reset successfully.');
+        else alert('Failed to reset password.');
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    async function deleteUser(id, name, btn) {
+      if (!confirm('Delete user "' + name + '" (ID: ' + id + ')? This cannot be undone.')) return;
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/portal/users/' + id, { method: 'DELETE', headers: getAuthHeaders() });
+        if (res.ok) {
+          allUsers = allUsers.filter(u => u.id !== id);
+          const row = document.getElementById('user-row-' + id);
+          if (row) row.remove();
+        } else {
+          alert('Could not delete user.');
+          btn.disabled = false;
+        }
+      } catch (e) {
+        alert('Error: ' + e.message);
+        btn.disabled = false;
+      }
+    }
+
+    async function submitAddUser(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('[type=submit]');
+      btn.textContent = 'Creating...';
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/portal/users', {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({
+            name: document.getElementById('newName').value,
+            email: document.getElementById('newEmail').value,
+            password: document.getElementById('newPassword').value,
+            role: document.getElementById('newRole').value
+          })
+        });
+        if (res.ok) {
+          document.getElementById('addUserModal').classList.add('hidden');
+          document.getElementById('addUserForm').reset();
+          document.getElementById('newPassword').value = 'camknock123';
+          loadUsers();
+        } else {
+          const d = await res.json();
+          alert(d.error || 'Failed to create user.');
+        }
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+      btn.textContent = 'Create User';
+      btn.disabled = false;
+    }
+
+    loadUsers();
+  </script>
+</body>
+</html>
+

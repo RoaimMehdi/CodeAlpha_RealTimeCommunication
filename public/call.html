@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CamKnock — Live Call</title>
+  <link rel="icon" href="/assets/camknock-icon.png" type="image/png">
+  <meta name="theme-color" content="#0A120E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #0A120E;
+      font-family: 'Manrope', system-ui, sans-serif;
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+      height: 100vh;
+      height: 100dvh;
+    }
+    * { box-sizing: border-box; }
+    a { color: #4ADE80; text-decoration: none; font-weight: 600; }
+    a:hover { color: #86EFAC; text-decoration: underline; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .hidden { display: none !important; }
+    
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+
+    /* Tile outlines */
+    .tile-outline {
+      outline: 2px solid transparent;
+      outline-offset: -2px;
+      transition: outline-color 0.2s ease;
+    }
+    .tile-outline.speaking {
+      outline-color: #22C55E !important;
+    }
+
+    /* Modal overlay */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      z-index: 100;
+    }
+    
+    @keyframes mrspin { to { transform: rotate(360deg); } }
+    .spin {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #4ADE80;
+      animation: mrspin 0.8s linear infinite;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+<div style="height:100vh;height:100dvh;display:flex;flex-direction:column;background:#0A120E;overflow:hidden">
+  
+  <!-- Header -->
+  <header style="height:60px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 20px">
+    <div style="display:flex;align-items:center;gap:12px;min-width:0">
+      <img src="/assets/camknock-icon.png" width="34" height="34" alt="CamKnock" style="border-radius:9px;flex:none;display:block;box-shadow:0 2px 8px rgba(14,122,75,0.35);background:#fff">
+      <div style="display:flex;flex-direction:column;min-width:0">
+        <div id="roomTitle" style="font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">CamKnock Room</div>
+        <div id="roomCode" style="font-size:12px;color:#A7BDB1;letter-spacing:0.04em">Room 482 913 607</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px">
+      <!-- Recording Badge -->
+      <div id="recBadge" class="hidden" style="display:flex;align-items:center;gap:7px;height:32px;padding:0 12px;border-radius:999px;background:rgba(220,38,38,0.18);color:#FCA5A5;font-size:12px;font-weight:700">
+        <span style="width:8px;height:8px;border-radius:50%;background:#EF4444"></span>REC
+      </div>
+
+      <!-- Encrypted Chip -->
+      <div style="display:flex;align-items:center;gap:7px;height:32px;padding:0 12px;border-radius:999px;background:#15221B;font-size:12px;font-weight:700;color:#CFE3D7">
+        <span style="width:7px;height:7px;border-radius:50%;background:#4ADE80"></span>Encrypted
+      </div>
+
+      <!-- Elapsed Timer -->
+      <div id="elapsed" style="height:32px;padding:0 12px;display:flex;align-items:center;border-radius:999px;background:#15221B;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums">00:00</div>
+
+      <!-- Copy Invite Button -->
+      <button id="copyInvite" type="button" style="height:32px;padding:0 14px;border:0;border-radius:999px;background:#0E7A4B;color:#fff;font-size:12px;font-weight:700;cursor:pointer">Copy invite</button>
+    </div>
+  </header>
+
+  <!-- Main Body / Stage + Sidebar -->
+  <div style="flex:1;min-height:0;display:flex;gap:12px;padding:0 12px;overflow:hidden">
+    
+    <!-- Stage Area -->
+    <div id="stage" style="flex:1;min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);gap:10px">
+      
+      <!-- Screen Share Container -->
+      <div id="shareStage" class="hidden" style="position:relative;border-radius:18px;overflow:hidden;background:#000;min-height:0">
+        <video id="shareVideo" autoplay muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain"></video>
+        <div style="position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:10px;height:36px;padding:0 6px 0 14px;border-radius:999px;background:rgba(10,18,14,0.8);font-size:13px;font-weight:700">
+          <span style="width:8px;height:8px;border-radius:50%;background:#4ADE80"></span>
+          <span id="shareUserLabel">You are sharing your screen</span>
+          <button id="stopShareBtn" type="button" style="height:26px;padding:0 10px;border:0;border-radius:999px;background:#DC2626;color:#fff;font-size:12px;font-weight:700;cursor:pointer">Stop</button>
+        </div>
+      </div>
+
+      <!-- Whiteboard Stage -->
+      <div id="whiteboardStage" class="hidden" style="position:relative;border-radius:18px;overflow:hidden;background:#0D1812;min-height:0;display:flex;flex-direction:column;box-shadow:0 12px 36px rgba(0,0,0,0.5);border:1px solid #1F2E26">
+        <!-- Floating Glassmorphic Whiteboard Toolbar -->
+        <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:rgba(10,18,14,0.88);border:1px solid rgba(255,255,255,0.15);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);z-index:10;box-shadow:0 8px 32px rgba(0,0,0,0.6)">
+          
+          <!-- Pen Tool -->
+          <button id="wbPenBtn" type="button" title="Pen" style="width:32px;height:32px;border-radius:50%;border:0;background:#0E7A4B;color:#fff;display:grid;place-items:center;cursor:pointer">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path></svg>
+          </button>
+          
+          <!-- Eraser Tool -->
+          <button id="wbEraserBtn" type="button" title="Eraser" style="width:32px;height:32px;border-radius:50%;border:0;background:transparent;color:#A7BDB1;display:grid;place-items:center;cursor:pointer">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16C2 15 2 13 3 12L13 2L22 11L20 20Z"></path><path d="M17 17L7 7"></path></svg>
+          </button>
+
+          <span style="height:16px;width:1px;background:#24362C"></span>
+
+          <!-- Color Swatches -->
+          <div style="display:flex;align-items:center;gap:6px">
+            <button type="button" class="wb-color" data-color="#22C55E" title="Emerald" style="width:18px;height:18px;border-radius:50%;border:2px solid #fff;background:#22C55E;cursor:pointer;padding:0;transform:scale(1.2)"></button>
+            <button type="button" class="wb-color" data-color="#FFFFFF" title="White" style="width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,0.4);background:#FFFFFF;cursor:pointer;padding:0"></button>
+            <button type="button" class="wb-color" data-color="#38BDF8" title="Cyan" style="width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,0.4);background:#38BDF8;cursor:pointer;padding:0"></button>
+            <button type="button" class="wb-color" data-color="#F59E0B" title="Amber" style="width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,0.4);background:#F59E0B;cursor:pointer;padding:0"></button>
+            <button type="button" class="wb-color" data-color="#EF4444" title="Red" style="width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,0.4);background:#EF4444;cursor:pointer;padding:0"></button>
+            <button type="button" class="wb-color" data-color="#A855F7" title="Purple" style="width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,0.4);background:#A855F7;cursor:pointer;padding:0"></button>
+          </div>
+
+          <span style="height:16px;width:1px;background:#24362C"></span>
+
+          <!-- Width Size Selector -->
+          <div style="display:flex;align-items:center;gap:3px">
+            <button type="button" class="wb-size" data-size="2" title="Fine" style="width:24px;height:24px;border-radius:6px;border:0;background:transparent;color:#A7BDB1;display:grid;place-items:center;cursor:pointer">
+              <span style="width:4px;height:4px;border-radius:50%;background:currentColor"></span>
+            </button>
+            <button type="button" class="wb-size" data-size="5" title="Medium" style="width:24px;height:24px;border-radius:6px;border:0;background:#24362C;color:#fff;display:grid;place-items:center;cursor:pointer">
+              <span style="width:7px;height:7px;border-radius:50%;background:currentColor"></span>
+            </button>
+            <button type="button" class="wb-size" data-size="10" title="Bold" style="width:24px;height:24px;border-radius:6px;border:0;background:transparent;color:#A7BDB1;display:grid;place-items:center;cursor:pointer">
+              <span style="width:11px;height:11px;border-radius:50%;background:currentColor"></span>
+            </button>
+          </div>
+
+          <span style="height:16px;width:1px;background:#24362C"></span>
+
+          <!-- Clear Board -->
+          <button id="wbClearBtn" type="button" title="Clear board for everyone" style="height:26px;padding:0 9px;border-radius:999px;border:0;background:rgba(220,38,38,0.22);color:#FCA5A5;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px;cursor:pointer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            Clear
+          </button>
+
+          <!-- Export PNG -->
+          <button id="wbSaveBtn" type="button" title="Save whiteboard drawing" style="height:26px;padding:0 9px;border-radius:999px;border:0;background:#1F2E26;color:#CFE3D7;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px;cursor:pointer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Save
+          </button>
+
+          <!-- Close Board -->
+          <button id="wbCloseBtn" type="button" title="Close whiteboard" style="width:26px;height:26px;border-radius:50%;border:0;background:rgba(255,255,255,0.1);color:#fff;display:grid;place-items:center;cursor:pointer">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+          </button>
+        </div>
+
+        <!-- Canvas Area with Aesthetic Dot Grid -->
+        <div id="wbCanvasWrap" style="flex:1;min-height:0;position:relative;background:#0D1812 radial-gradient(rgba(74,222,128,0.15) 1.5px, transparent 1.5px);background-size:24px 24px;cursor:crosshair">
+          <canvas id="wbCanvas" style="position:absolute;inset:0;width:100%;height:100%;touch-action:none"></canvas>
+          <div style="position:absolute;bottom:12px;right:16px;pointer-events:none;display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(167,189,177,0.55);font-weight:700;letter-spacing:0.04em">
+            <span style="width:6px;height:6px;border-radius:50%;background:#4ADE80"></span>
+            COLLABORATIVE BOARD
+          </div>
+        </div>
+      </div>
+
+      <!-- Video Grid Container -->
+      <div id="tiles" style="min-height:0;display:grid;grid-template-columns:minmax(0,1fr);grid-auto-rows:minmax(0,1fr);gap:10px">
+        
+        <!-- Self Video Tile -->
+        <div id="selfTile" class="tile-outline" style="position:relative;min-height:0;border-radius:18px;overflow:hidden;background:#15221B">
+          <video id="selfVideo" autoplay muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:none"></video>
+          <div id="selfPlaceholder" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;text-align:center">
+            <div id="selfAvatar" style="width:84px;height:84px;border-radius:50%;background:#0E7A4B;display:grid;place-items:center;font-size:28px;font-weight:800;color:#fff">AK</div>
+            <div id="camNote" style="font-size:13px;color:#A7BDB1">Starting camera…</div>
+          </div>
+          
+          <div style="position:absolute;left:10px;bottom:10px;display:flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:8px;background:rgba(10,18,14,0.72);font-size:12px;font-weight:700">
+            <span id="selfMute" class="hidden">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="2.2" stroke-linecap="round"><path d="M9 9v3a3 3 0 0 0 5.1 2.1M15 9.3V5a3 3 0 0 0-5.7-1.3"></path><path d="M19 11a7 7 0 0 1-1.2 3.9M5 11a7 7 0 0 0 11.2 5.6M12 18v3M3 3l18 18"></path></svg>
+            </span>
+            <span id="selfName">You</span>
+            <span id="selfHand" class="hidden" style="padding:2px 6px;border-radius:5px;background:#F59E0B;color:#1F1300;font-size:11px">Hand raised</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Right Collapsible Panel (Chat, People, Files) -->
+    <aside id="side" class="hidden" style="width:340px;flex:none;display:flex;flex-direction:column;border-radius:18px;background:#121D17;overflow:hidden">
+      <!-- Panel Header -->
+      <div style="height:56px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 18px;border-bottom:1px solid #1F2E26">
+        <div style="display:flex;gap:4px;padding:3px;border-radius:10px;background:#0A120E">
+          <button id="chatTab" type="button" style="height:32px;padding:0 14px;border:0;border-radius:8px;background:#24362C;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Chat</button>
+          <button id="peopleTab" type="button" style="height:32px;padding:0 14px;border:0;border-radius:8px;background:transparent;color:#fff;font-size:13px;font-weight:700;cursor:pointer">People (<span id="peopleCount">1</span>)</button>
+          <button id="filesTab" type="button" style="height:32px;padding:0 14px;border:0;border-radius:8px;background:transparent;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Files (<span id="filesCount">0</span>)</button>
+        </div>
+        <button id="closePanel" type="button" aria-label="Close panel" style="width:40px;height:40px;border:0;border-radius:10px;background:transparent;color:#A7BDB1;cursor:pointer;display:grid;place-items:center">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </div>
+
+      <!-- Chat Pane with Real-Time Multi-Language Converter -->
+      <div id="chatPane" style="flex:1;min-height:0;display:flex;flex-direction:column">
+        <!-- Translation Control Bar -->
+        <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;background:#0B1410;border-bottom:1px solid #1F2E26;font-size:12px">
+          <div style="display:flex;align-items:center;gap:6px;color:#A7BDB1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span style="font-weight:700">Translate to:</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <select id="chatLangSelect" style="height:28px;padding:0 8px;border-radius:6px;background:#15221B;color:#fff;border:1px solid #24362C;font-size:12px;font-weight:700;outline:none;cursor:pointer">
+              <option value="de">🇩🇪 German</option>
+              <option value="es">🇪🇸 Spanish</option>
+              <option value="it">🇮🇹 Italian</option>
+              <option value="en" selected>🇬🇧 English</option>
+              <option value="fr">🇫🇷 French</option>
+              <option value="ur">🇵🇰 Urdu</option>
+              <option value="ar">🇸🇦 Arabic</option>
+            </select>
+            <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:#A7BDB1;cursor:pointer" title="Automatically translate incoming messages">
+              <input type="checkbox" id="autoTranslateToggle" style="accent-color:#0E7A4B;cursor:pointer">
+              Auto
+            </label>
+          </div>
+        </div>
+
+        <!-- Chat Messages List -->
+        <div id="chatList" style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:14px;padding:16px 18px"></div>
+        
+        <!-- Chat Input & Quick Convert Bar -->
+        <form id="chatForm" style="flex:none;display:flex;flex-direction:column;gap:8px;padding:12px;border-top:1px solid #1F2E26">
+          <div style="display:flex;gap:8px">
+            <input id="draft" placeholder="Message everyone..." autocomplete="off" style="flex:1;min-width:0;height:44px;padding:0 14px;border:1.5px solid #24362C;border-radius:10px;background:#0A120E;color:#fff;font-size:14px;outline:none">
+            <button type="submit" style="height:44px;padding:0 16px;border:0;border-radius:10px;background:#0E7A4B;color:#fff;font-size:14px;font-weight:700;cursor:pointer">Send</button>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0 2px">
+            <span id="transStatus" style="font-size:11px;color:#A7BDB1;min-height:14px"></span>
+            <button id="convertDraftBtn" type="button" style="display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;color:#4ADE80;font-size:11px;font-weight:700;cursor:pointer;padding:2px 6px;border-radius:4px" title="Convert your typed message to the selected language before sending">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              Translate Draft
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- People Pane -->
+      <div id="peoplePane" class="hidden" style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:4px;padding:12px">
+        <div style="display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:10px">
+          <div id="selfInitials" style="width:36px;height:36px;border-radius:50%;background:#0E7A4B;display:grid;place-items:center;font-size:13px;font-weight:800;color:#fff">AK</div>
+          <div style="flex:1;font-size:14px;font-weight:700">You <span id="hostBadge" style="font-weight:600;color:#A7BDB1">(Host)</span></div>
+          <div id="selfStatus" style="font-size:12px;color:#A7BDB1">Mic on</div>
+        </div>
+        <div id="peopleList" style="display:flex;flex-direction:column;gap:4px"></div>
+      </div>
+
+      <!-- Files Pane -->
+      <div id="filesPane" class="hidden" style="flex:1;min-height:0;display:flex;flex-direction:column;padding:14px;gap:12px;overflow:hidden">
+        <div id="fileDropzone" style="border:2px dashed #24362C;border-radius:14px;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;cursor:pointer;background:rgba(14,122,75,0.08)">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          <div style="font-size:13px;font-weight:700;color:#fff">Drop file or click to upload</div>
+          <div style="font-size:11px;color:#A7BDB1">Up to 25 MB</div>
+          <input type="file" id="filePicker" class="hidden">
+        </div>
+        <div id="uploadStatus" class="hidden" style="padding:6px 10px;border-radius:8px;background:#15221B;color:#4ADE80;font-size:12px;font-weight:700">
+          <span class="spin" style="margin-right:6px"></span>
+          <span id="uploadStatusText">Uploading file…</span>
+        </div>
+        <div id="filesList" style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:8px">
+          <div id="emptyFilesMsg" style="padding:16px;text-align:center;color:#A7BDB1;font-size:12px">No files shared yet.</div>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- Bottom Control Bar -->
+  <footer style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px 14px;flex-wrap:wrap">
+    <!-- Left Note -->
+    <div id="footNote" style="flex:1 1 140px;font-size:13px;color:#A7BDB1;font-weight:600">1 in this room</div>
+
+    <!-- Center Control Buttons -->
+    <div style="display:flex;align-items:flex-start;gap:6px">
+      <!-- Mic -->
+      <button id="micBtn" type="button" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer">
+        <span id="micBg" style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#1A2820">
+          <svg id="micIconOn" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg>
+          <svg id="micIconOff" class="hidden" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 9v3a3 3 0 0 0 5.1 2.1M15 9.3V5a3 3 0 0 0-5.7-1.3"></path><path d="M19 11a7 7 0 0 1-1.2 3.9M5 11a7 7 0 0 0 11.2 5.6M12 18v3M3 3l18 18"></path></svg>
+        </span>
+        <span id="micLabel" style="font-size:12px;font-weight:700">Mute</span>
+      </button>
+
+      <!-- Cam -->
+      <button id="camBtn" type="button" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer">
+        <span id="camBg" style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#1A2820">
+          <svg id="camIconOn" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="14" height="14" rx="2"></rect><path d="M16 10l6-3.5v11L16 14"></path></svg>
+          <svg id="camIconOff" class="hidden" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m4 0h4a2 2 0 0 1 2 2v3.3l1 1L22 8v8"></path><path d="M3 3l18 18"></path></svg>
+        </span>
+        <span id="camLabel" style="font-size:12px;font-weight:700">Stop video</span>
+      </button>
+
+      <!-- Share -->
+      <button id="shareBtn" type="button" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer">
+        <span id="shareBg" style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#1A2820">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"></rect><path d="M8 21h8M12 17v4M12 13V8M9.5 10.5L12 8l2.5 2.5"></path></svg>
+        </span>
+        <span id="shareLabel" style="font-size:12px;font-weight:700">Share</span>
+      </button>
+
+      <!-- Whiteboard -->
+      <button id="boardBtn" type="button" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer">
+        <span id="boardBg" style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#1A2820">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
+        </span>
+        <span id="boardLabel" style="font-size:12px;font-weight:700">Board</span>
+      </button>
+
+      <!-- Hand -->
+      <button id="handBtn" type="button" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer">
+        <span id="handBg" style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#1A2820">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v6M10 10.5V6a2 2 0 0 0-4 0v8"></path><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6-2.4l-3.6-3.6a2 2 0 0 1 2.8-2.8L7 15"></path></svg>
+        </span>
+        <span id="handLabel" style="font-size:12px;font-weight:700">Raise</span>
+      </button>
+
+      <!-- Rec -->
+      <button id="recBtn" type="button" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer">
+        <span id="recBg" style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#1A2820">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg>
+        </span>
+        <span id="recLabel" style="font-size:12px;font-weight:700">Record</span>
+      </button>
+
+      <!-- Message -->
+      <button id="chatBtn" type="button" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer">
+        <span id="chatBg" style="position:relative;width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#1A2820">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z"></path></svg>
+          <span id="unread" class="hidden" style="position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:#16A34A;font-size:11px;font-weight:800;display:grid;place-items:center;color:#fff">0</span>
+        </span>
+        <span style="font-size:12px;font-weight:700">Message</span>
+      </button>
+
+      <!-- People -->
+      <button id="peopleBtn" type="button" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer">
+        <span id="peopleBg" style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#1A2820">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"></circle><path d="M2 21a7 7 0 0 1 14 0M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"></path></svg>
+        </span>
+        <span style="font-size:12px;font-weight:700">People</span>
+      </button>
+    </div>
+
+    <!-- Right Leave Button -->
+    <div style="flex:1 1 140px;display:flex;justify-content:flex-end">
+      <button id="leaveBtn" type="button" style="height:48px;padding:0 22px;border:0;border-radius:14px;background:#DC2626;color:#fff;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:8px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l-5-5 5-5M5 12h11M16 4h3a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-3"></path></svg>
+        Leave
+      </button>
+    </div>
+  </footer>
+</div>
+
+<!-- Leave Confirmation Modal -->
+<div id="leaveModal" class="hidden modal-overlay">
+  <div style="width:100%;max-width:380px;display:flex;flex-direction:column;gap:18px;padding:28px;border-radius:20px;background:#121D17;box-shadow:0 30px 80px rgba(0,0,0,0.5)">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <h2 style="margin:0;font-size:22px;font-weight:800">Leave this room?</h2>
+      <p id="leaveCopy" style="margin:0;font-size:14px;color:#A7BDB1;line-height:1.5">You're the host. End the room for everyone, or leave and let the others carry on.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button id="endAllBtn" type="button" class="hidden" style="height:48px;border:0;border-radius:12px;background:#DC2626;color:#fff;font-size:15px;font-weight:800;cursor:pointer">End room for all</button>
+      <button id="leaveOnly" type="button" style="height:48px;border:1.5px solid #2B3F34;border-radius:12px;background:transparent;color:#fff;font-size:15px;font-weight:700;cursor:pointer">Leave room</button>
+      <button id="cancelLeave" type="button" style="height:44px;border:0;border-radius:12px;background:transparent;color:#A7BDB1;font-size:14px;font-weight:700;cursor:pointer">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/core.js?v=15"></script>
+<script src="/js/call.js?v=15"></script>
+</body>
+</html>

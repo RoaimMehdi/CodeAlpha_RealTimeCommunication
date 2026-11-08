@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CamKnock — Create Account</title>
+  <link rel="icon" href="/assets/camknock-icon.png" type="image/png">
+  <meta name="theme-color" content="#0E7A4B">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      font-family: 'Manrope', system-ui, sans-serif;
+      color: #10231a;
+      -webkit-font-smoothing: antialiased;
+    }
+    * { box-sizing: border-box; }
+    a { color: #0E7A4B; text-decoration: none; font-weight: 600; }
+    a:hover { color: #0A5E39; text-decoration: underline; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { opacity: 0.7; cursor: default; }
+    .input-field {
+      width: 100%;
+      height: 50px;
+      padding: 0 14px;
+      border: 1.5px solid #DCE6E0;
+      border-radius: 10px;
+      font-size: 15px;
+      color: #10231a;
+      outline: none;
+      background: #fff;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .input-field:focus {
+      border-color: #0E7A4B !important;
+      box-shadow: 0 0 0 4px rgba(14, 122, 75, 0.15) !important;
+    }
+    .input-field.has-error {
+      border-color: #B42318 !important;
+    }
+    .btn-submit {
+      height: 52px;
+      border: 0;
+      border-radius: 10px;
+      background: #0E7A4B;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background 0.15s ease;
+    }
+    .btn-submit:hover:not(:disabled) {
+      background: #0A5E39;
+    }
+    .hidden { display: none !important; }
+    .err-text {
+      font-size: 13px;
+      color: #B42318;
+      font-weight: 600;
+      min-height: 18px;
+      margin: 2px 0 0;
+    }
+    @keyframes mrspin { to { transform: rotate(360deg); } }
+    .spin {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2.5px solid rgba(255, 255, 255, 0.4);
+      border-top-color: #fff;
+      animation: mrspin 0.8s linear infinite;
+      display: inline-block;
+      flex: none;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .anim-in { animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  </style>
+</head>
+<body>
+<div style="min-height:100vh;display:flex;flex-wrap:wrap;gap:12px;padding:12px;background:#fff">
+
+  <!-- Left Side Art Slideshow -->
+  <aside style="flex:1.15 1 380px;position:relative;min-height:min(calc(100vh - 24px),560px);border-radius:24px;overflow:hidden;background:#0B5D3B;color:#fff">
+    <!-- Slides -->
+    <div id="slide0" style="position:absolute;inset:0;opacity:1;pointer-events:auto;transform:scale(1.06);transition:opacity 0.9s ease,transform 6s ease-out">
+      <img src="https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?fm=jpg&q=70&w=1600&auto=format&fit=crop" alt="" style="width:100%;height:100%;object-fit:cover">
+    </div>
+    <div id="slide1" style="position:absolute;inset:0;opacity:0;pointer-events:none;transform:scale(1);transition:opacity 0.9s ease,transform 6s ease-out">
+      <img src="https://images.unsplash.com/photo-1787647562201-113361490c83?fm=jpg&q=70&w=1600&auto=format&fit=crop" alt="" style="width:100%;height:100%;object-fit:cover">
+    </div>
+    <div id="slide2" style="position:absolute;inset:0;opacity:0;pointer-events:none;transform:scale(1);transition:opacity 0.9s ease,transform 6s ease-out">
+      <img src="https://images.unsplash.com/photo-1616587894289-86480e533129?fm=jpg&q=70&w=1600&auto=format&fit=crop" alt="" style="width:100%;height:100%;object-fit:cover">
+    </div>
+
+    <!-- Gradient Overlay -->
+    <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(4,38,24,0.55) 0%,rgba(4,38,24,0) 22%,rgba(4,38,24,0) 45%,rgba(4,38,24,0.55) 78%,rgba(4,38,24,0.35) 100%)"></div>
+
+    <!-- Top Branding -->
+    <div style="position:absolute;top:24px;left:24px;right:24px;display:flex;align-items:center;justify-content:space-between;gap:12px;pointer-events:none;z-index:2">
+      <a href="/" style="display:flex;align-items:center;gap:11px;pointer-events:auto;text-decoration:none">
+        <img src="/assets/camknock-icon.png" width="38" height="38" alt="CamKnock" style="border-radius:10px;display:block;box-shadow:0 4px 12px rgba(0,0,0,0.25)">
+        <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;color:#fff;display:flex;align-items:center">
+          Cam<span style="color:#4ADE80">Knock</span>
+        </div>
+      </a>
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.28);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);font-size:12px;font-weight:700">
+        <span style="width:7px;height:7px;border-radius:50%;background:#4ADE80"></span>
+        <span>End-to-end encrypted</span>
+      </div>
+    </div>
+
+    <!-- Bottom Caption Box -->
+    <div style="position:absolute;left:24px;right:24px;bottom:44px;display:flex;flex-direction:column;gap:18px;padding:24px 26px;border-radius:20px;background:rgba(6,52,33,0.62);color:#fff;border:1px solid rgba(255,255,255,0.22);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);z-index:2">
+      <div style="display:grid">
+        <div id="caption0" style="grid-area:1/1;display:flex;flex-direction:column;gap:8px;opacity:1;transform:translateY(0);transition:opacity 0.5s ease,transform 0.5s ease">
+          <h1 style="margin:0;font-size:32px;line-height:1.12;font-weight:800;letter-spacing:-0.03em">One account, every room.</h1>
+          <p style="margin:0;font-size:15px;line-height:1.5">Host meetings with instant invite links, chat, and HD video.</p>
+        </div>
+        <div id="caption1" style="grid-area:1/1;display:flex;flex-direction:column;gap:8px;opacity:0;transform:translateY(8px);transition:opacity 0.5s ease,transform 0.5s ease">
+          <h1 style="margin:0;font-size:32px;line-height:1.12;font-weight:800;letter-spacing:-0.03em">Share with a single code.</h1>
+          <p style="margin:0;font-size:15px;line-height:1.5">Guests join straight from their browser without downloading apps.</p>
+        </div>
+        <div id="caption2" style="grid-area:1/1;display:flex;flex-direction:column;gap:8px;opacity:0;transform:translateY(8px);transition:opacity 0.5s ease,transform 0.5s ease">
+          <h1 style="margin:0;font-size:32px;line-height:1.12;font-weight:800;letter-spacing:-0.03em">Zero hassle, always ready.</h1>
+          <p style="margin:0;font-size:15px;line-height:1.5">Crystal-clear communication built for speed and security.</p>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div style="display:flex;gap:6px;align-items:center">
+          <button id="dot0" type="button" aria-label="Slide 1" style="width:28px;height:6px;padding:0;border:0;border-radius:3px;background:#fff;opacity:1;cursor:pointer;transition:width 0.3s ease,opacity 0.3s ease"></button>
+          <button id="dot1" type="button" aria-label="Slide 2" style="width:6px;height:6px;padding:0;border:0;border-radius:3px;background:#fff;opacity:0.4;cursor:pointer;transition:width 0.3s ease,opacity 0.3s ease"></button>
+          <button id="dot2" type="button" aria-label="Slide 3" style="width:6px;height:6px;padding:0;border:0;border-radius:3px;background:#fff;opacity:0.4;cursor:pointer;transition:width 0.3s ease,opacity 0.3s ease"></button>
+        </div>
+        <div id="slideCount" style="font-size:12px;font-weight:700;letter-spacing:0.08em">01 / 03</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Right Main Area -->
+  <main class="anim-in" style="flex:1 1 360px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:20px;padding:20px 24px;border-radius:24px;background:#F2F8F4">
+    <!-- Topbar -->
+    <div style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#4B5F55">
+        <span style="width:8px;height:8px;border-radius:50%;background:#16A34A"></span>
+        <span id="healthLabel">All systems operational</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#4B5F55">
+        <span>Already have an account?</span>
+        <a href="/" style="height:36px;padding:0 14px;display:inline-flex;align-items:center;border-radius:999px;border:1.5px solid #CFE3D7;background:#fff;color:#0A5E39;font-weight:700;text-decoration:none">Sign in</a>
+      </div>
+    </div>
+
+    <!-- Auth Card -->
+    <div style="width:100%;max-width:520px;display:flex;flex-direction:column;gap:26px;background:#fff;padding:44px 40px;border-radius:20px;box-shadow:0 1px 2px rgba(10,61,39,0.06), 0 12px 32px rgba(10,61,39,0.08)">
+      <form id="signupForm" novalidate style="display:flex;flex-direction:column;gap:18px">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <h2 style="margin:0;font-size:26px;font-weight:800;letter-spacing:-0.02em">Create your account</h2>
+          <p style="margin:0;font-size:15px;color:#4B5F55">Host your own rooms and collaborate seamlessly.</p>
+        </div>
+
+        <label style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:13px;font-weight:700">Full name</span>
+          <input type="text" id="fullName" class="input-field" placeholder="Alex Morgan" autocomplete="name">
+          <span id="nameErr" class="err-text"></span>
+        </label>
+
+        <label style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:13px;font-weight:700">Email</span>
+          <input type="email" id="regEmail" class="input-field" placeholder="you@company.com" autocomplete="email">
+          <span id="emailErr" class="err-text"></span>
+        </label>
+
+        <label style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:13px;font-weight:700">Password</span>
+          <span style="position:relative;display:block">
+            <input type="password" id="regPassword" class="input-field" placeholder="At least 8 characters" autocomplete="new-password" style="padding-right:72px">
+            <button type="button" id="togglePw" style="position:absolute;right:6px;top:7px;height:36px;padding:0 12px;border:0;border-radius:8px;background:transparent;font-size:13px;font-weight:700;color:#0E7A4B;cursor:pointer">Show</button>
+          </span>
+          <span id="pwErr" class="err-text"></span>
+        </label>
+
+        <button id="signupBtn" type="submit" class="btn-submit">
+          <span id="signupSpinner" class="spin hidden"></span>
+          <span id="signupLabel">Create account</span>
+        </button>
+
+        <div id="authOk" class="hidden" style="padding:12px 14px;border-radius:10px;background:#E6F4EC;color:#0A5E39;font-size:14px;font-weight:600">
+          Account created! Taking you to your dashboard…
+        </div>
+
+        <p style="margin:0;font-size:13px;line-height:1.5;color:#4B5F55;text-align:center">
+          By signing up, you agree to CamKnock Terms of Service & Privacy Policy.
+        </p>
+
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding-top:12px;border-top:1px solid #EEF5F1;font-size:14px;color:#4B5F55">
+          <span>Have an invite link?</span>
+          <a href="/?mode=join">Join a meeting</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px;color:#4B5F55">
+      <span>© 2026 CamKnock. All rights reserved.</span>
+      <div style="display:flex;gap:18px">
+        <a href="/privacy" style="color:#4B5F55;font-weight:600">Privacy</a>
+        <a href="/terms" style="color:#4B5F55;font-weight:600">Terms</a>
+        <a href="/help" style="color:#4B5F55;font-weight:600">Help</a>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/js/core.js?v=15"></script>
+<script src="/js/signup.js?v=15"></script>
+</body>
+</html>
