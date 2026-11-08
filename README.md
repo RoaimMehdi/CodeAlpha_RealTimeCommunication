@@ -181,3 +181,5 @@ Compose starts the app on port 9000 and a MySQL 8 database, applying
 ## License
 
 Internal project. No license granted for redistribution.
+#   C o d e A l p h a _ R e a l T i m e C o m m u n i c a t i o n  
+ 
