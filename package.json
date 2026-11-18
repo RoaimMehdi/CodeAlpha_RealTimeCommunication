@@ -7,6 +7,19 @@
     "start": "node meetroom/server.js",
     "dev": "node --watch meetroom/server.js",
     "health": "node -e \"fetch('http://localhost:'+(process.env.PORT||9000)+'/api/health').then(r=>r.json()).then(j=>{console.log(JSON.stringify(j,null,2));process.exit(j.status==='ok'?0:1)}).catch(e=>{console.error(e.message);process.exit(1)})\""
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "compression": "^1.8.2",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.9",
+    "express": "^4.22.3",
+    "express-rate-limit": "^8.7.3",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.12.1",
+    "multer": "^2.5.0",
+    "mysql2": "^3.24.6",
+    "socket.io": "^4.8.4"
   }
 }
-

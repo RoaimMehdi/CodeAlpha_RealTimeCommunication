@@ -64,14 +64,307 @@
       animation: mrspin 0.8s linear infinite;
       display: inline-block;
     }
+
+    /* Responsive Call Layout */
+    .call-shell {
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: #0A120E;
+      overflow: hidden;
+    }
+    .call-header {
+      height: 60px;
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .call-header-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .call-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .call-stage-wrapper {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      gap: 12px;
+      padding: 0 12px;
+      overflow: hidden;
+      position: relative;
+    }
+    .call-footer {
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 20px 14px;
+      background: #0A120E;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 50;
+    }
+    .call-footnote {
+      flex: 1 1 120px;
+      font-size: 13px;
+      color: #A7BDB1;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .controls-cluster {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ctrl-btn {
+      width: 74px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.1s ease;
+    }
+    .ctrl-btn:hover {
+      transform: translateY(-1px);
+    }
+    .ctrl-btn:active {
+      transform: translateY(1px);
+    }
+    .ctrl-icon-bg {
+      width: 50px;
+      height: 50px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: #1A2820;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .ctrl-btn:hover .ctrl-icon-bg {
+      background: #24362C;
+      border-color: rgba(74, 222, 128, 0.3);
+    }
+    .ctrl-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      white-space: nowrap;
+      color: #CFE3D7;
+    }
+    .leave-cluster {
+      flex: 1 1 120px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .leave-btn {
+      height: 48px;
+      padding: 0 20px;
+      border: 0;
+      border-radius: 14px;
+      background: #DC2626;
+      color: #fff;
+      font-size: 14.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .leave-btn:hover {
+      background: #B91C1C;
+    }
+
+    /* Side Panel */
+    .call-sidebar {
+      width: 360px;
+      display: flex;
+      flex-direction: column;
+      border-radius: 18px;
+      background: #121D17;
+      border: 1px solid #1F2E26;
+      overflow: hidden;
+      flex: none;
+      transition: transform 0.25s ease;
+    }
+
+    /* Whiteboard toolbar */
+    .wb-toolbar {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(10, 18, 14, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      z-index: 10;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      max-width: calc(100% - 20px);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .wb-toolbar::-webkit-scrollbar { display: none; }
+
+    /* Media Queries for Call Interface */
+    @media (max-width: 900px) {
+      .call-header {
+        height: 52px;
+        padding: 0 14px;
+        gap: 10px;
+      }
+      .call-header-actions {
+        gap: 8px;
+      }
+      .call-footer {
+        padding: 8px 14px 10px;
+      }
+      .ctrl-btn {
+        width: 60px;
+        gap: 4px;
+      }
+      .ctrl-icon-bg {
+        width: 44px;
+        height: 44px;
+        border-radius: 13px;
+      }
+      .ctrl-label {
+        font-size: 10.5px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .call-footnote {
+        display: none !important;
+      }
+      .call-header-info img {
+        width: 28px;
+        height: 28px;
+      }
+      #roomTitle {
+        font-size: 13px !important;
+        max-width: 120px;
+      }
+      #roomCode {
+        font-size: 10.5px !important;
+      }
+      .encrypted-chip .chip-text {
+        display: none;
+      }
+      .encrypted-chip {
+        padding: 0 8px !important;
+        height: 28px !important;
+      }
+      #elapsed {
+        height: 28px !important;
+        padding: 0 8px !important;
+        font-size: 11px !important;
+      }
+      #copyInvite {
+        height: 28px !important;
+        padding: 0 10px !important;
+        font-size: 11px !important;
+      }
+      #recBadge {
+        height: 28px !important;
+        padding: 0 8px !important;
+        font-size: 11px !important;
+      }
+
+      /* Full Screen Mobile Drawer for Side Panel (Chat / People / Files) */
+      .call-sidebar {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 100dvh !important;
+        z-index: 200 !important;
+        border-radius: 0 !important;
+        border: none !important;
+      }
+
+      .controls-cluster {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        max-width: calc(100% - 64px);
+        padding: 2px 0;
+        gap: 4px;
+      }
+      .controls-cluster::-webkit-scrollbar {
+        display: none;
+      }
+      .leave-cluster {
+        flex: none;
+      }
+      .leave-btn {
+        height: 42px;
+        padding: 0 12px;
+        font-size: 13px;
+        border-radius: 10px;
+      }
+      .leave-btn .leave-label {
+        display: none;
+      }
+      .wb-toolbar {
+        top: 8px;
+        gap: 5px;
+        padding: 4px 8px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .call-stage-wrapper {
+        padding: 0 6px;
+      }
+      .ctrl-btn {
+        width: 50px;
+      }
+      .ctrl-icon-bg {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+      }
+      .ctrl-icon-bg svg {
+        width: 19px;
+        height: 19px;
+      }
+      .ctrl-label {
+        font-size: 10px;
+      }
+    }
   </style>
 </head>
 <body>
-<div style="height:100vh;height:100dvh;display:flex;flex-direction:column;background:#0A120E;overflow:hidden">
+<div class="call-shell">
   
   <!-- Header -->
-  <header style="height:60px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 20px">
-    <div style="display:flex;align-items:center;gap:12px;min-width:0">
+  <header class="call-header">
+    <div class="call-header-info">
       <img src="/assets/camknock-icon.png" width="34" height="34" alt="CamKnock" style="border-radius:9px;flex:none;display:block;box-shadow:0 2px 8px rgba(14,122,75,0.35);background:#fff">
       <div style="display:flex;flex-direction:column;min-width:0">
         <div id="roomTitle" style="font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">CamKnock Room</div>
@@ -79,15 +372,15 @@
       </div>
     </div>
 
-    <div style="display:flex;align-items:center;gap:10px">
+    <div class="call-header-actions">
       <!-- Recording Badge -->
       <div id="recBadge" class="hidden" style="display:flex;align-items:center;gap:7px;height:32px;padding:0 12px;border-radius:999px;background:rgba(220,38,38,0.18);color:#FCA5A5;font-size:12px;font-weight:700">
         <span style="width:8px;height:8px;border-radius:50%;background:#EF4444"></span>REC
       </div>
 
       <!-- Encrypted Chip -->
-      <div style="display:flex;align-items:center;gap:7px;height:32px;padding:0 12px;border-radius:999px;background:#15221B;font-size:12px;font-weight:700;color:#CFE3D7">
-        <span style="width:7px;height:7px;border-radius:50%;background:#4ADE80"></span>Encrypted
+      <div class="encrypted-chip" style="display:flex;align-items:center;gap:7px;height:32px;padding:0 12px;border-radius:999px;background:#15221B;font-size:12px;font-weight:700;color:#CFE3D7">
+        <span style="width:7px;height:7px;border-radius:50%;background:#4ADE80"></span><span class="chip-text">Encrypted</span>
       </div>
 
       <!-- Elapsed Timer -->
@@ -99,7 +392,7 @@
   </header>
 
   <!-- Main Body / Stage + Sidebar -->
-  <div style="flex:1;min-height:0;display:flex;gap:12px;padding:0 12px;overflow:hidden">
+  <div class="call-stage-wrapper">
     
     <!-- Stage Area -->
     <div id="stage" style="flex:1;min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);gap:10px">
@@ -117,7 +410,7 @@
       <!-- Whiteboard Stage -->
       <div id="whiteboardStage" class="hidden" style="position:relative;border-radius:18px;overflow:hidden;background:#0D1812;min-height:0;display:flex;flex-direction:column;box-shadow:0 12px 36px rgba(0,0,0,0.5);border:1px solid #1F2E26">
         <!-- Floating Glassmorphic Whiteboard Toolbar -->
-        <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:rgba(10,18,14,0.88);border:1px solid rgba(255,255,255,0.15);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);z-index:10;box-shadow:0 8px 32px rgba(0,0,0,0.6)">
+        <div class="wb-toolbar">
           
           <!-- Pen Tool -->
           <button id="wbPenBtn" type="button" title="Pen" style="width:32px;height:32px;border-radius:50%;border:0;background:#0E7A4B;color:#fff;display:grid;place-items:center;cursor:pointer">
@@ -210,7 +503,7 @@
     </div>
 
     <!-- Right Collapsible Panel (Chat, People, Files) -->
-    <aside id="side" class="hidden" style="width:340px;flex:none;display:flex;flex-direction:column;border-radius:18px;background:#121D17;overflow:hidden">
+    <aside id="side" class="call-sidebar hidden" style="width:340px;flex:none;display:flex;flex-direction:column;border-radius:18px;background:#121D17;overflow:hidden">
       <!-- Panel Header -->
       <div style="height:56px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 18px;border-bottom:1px solid #1F2E26">
         <div style="display:flex;gap:4px;padding:3px;border-radius:10px;background:#0A120E">
@@ -298,85 +591,85 @@
   </div>
 
   <!-- Bottom Control Bar -->
-  <footer style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px 14px;flex-wrap:wrap">
+  <footer class="call-footer">
     <!-- Left Note -->
-    <div id="footNote" style="flex:1 1 140px;font-size:13px;color:#A7BDB1;font-weight:600">1 in this room</div>
+    <div id="footNote" class="call-footnote">1 in this room</div>
 
     <!-- Center Control Buttons -->
-    <div style="display:flex;align-items:flex-start;gap:6px">
+    <div class="controls-cluster">
       <!-- Mic -->
-      <button id="micBtn" type="button" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer">
-        <span id="micBg" style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#1A2820">
+      <button id="micBtn" type="button" class="ctrl-btn">
+        <span id="micBg" class="ctrl-icon-bg">
           <svg id="micIconOn" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg>
           <svg id="micIconOff" class="hidden" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 9v3a3 3 0 0 0 5.1 2.1M15 9.3V5a3 3 0 0 0-5.7-1.3"></path><path d="M19 11a7 7 0 0 1-1.2 3.9M5 11a7 7 0 0 0 11.2 5.6M12 18v3M3 3l18 18"></path></svg>
         </span>
-        <span id="micLabel" style="font-size:12px;font-weight:700">Mute</span>
+        <span id="micLabel" class="ctrl-label">Mute</span>
       </button>
 
       <!-- Cam -->
-      <button id="camBtn" type="button" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer">
-        <span id="camBg" style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#1A2820">
+      <button id="camBtn" type="button" class="ctrl-btn">
+        <span id="camBg" class="ctrl-icon-bg">
           <svg id="camIconOn" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="14" height="14" rx="2"></rect><path d="M16 10l6-3.5v11L16 14"></path></svg>
           <svg id="camIconOff" class="hidden" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m4 0h4a2 2 0 0 1 2 2v3.3l1 1L22 8v8"></path><path d="M3 3l18 18"></path></svg>
         </span>
-        <span id="camLabel" style="font-size:12px;font-weight:700">Stop video</span>
+        <span id="camLabel" class="ctrl-label">Stop video</span>
       </button>
 
       <!-- Share -->
-      <button id="shareBtn" type="button" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer">
-        <span id="shareBg" style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#1A2820">
+      <button id="shareBtn" type="button" class="ctrl-btn">
+        <span id="shareBg" class="ctrl-icon-bg">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"></rect><path d="M8 21h8M12 17v4M12 13V8M9.5 10.5L12 8l2.5 2.5"></path></svg>
         </span>
-        <span id="shareLabel" style="font-size:12px;font-weight:700">Share</span>
+        <span id="shareLabel" class="ctrl-label">Share</span>
       </button>
 
       <!-- Whiteboard -->
-      <button id="boardBtn" type="button" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer">
-        <span id="boardBg" style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#1A2820">
+      <button id="boardBtn" type="button" class="ctrl-btn">
+        <span id="boardBg" class="ctrl-icon-bg">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
         </span>
-        <span id="boardLabel" style="font-size:12px;font-weight:700">Board</span>
+        <span id="boardLabel" class="ctrl-label">Board</span>
       </button>
 
       <!-- Hand -->
-      <button id="handBtn" type="button" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer">
-        <span id="handBg" style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#1A2820">
+      <button id="handBtn" type="button" class="ctrl-btn">
+        <span id="handBg" class="ctrl-icon-bg">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v6M10 10.5V6a2 2 0 0 0-4 0v8"></path><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6-2.4l-3.6-3.6a2 2 0 0 1 2.8-2.8L7 15"></path></svg>
         </span>
-        <span id="handLabel" style="font-size:12px;font-weight:700">Raise</span>
+        <span id="handLabel" class="ctrl-label">Raise</span>
       </button>
 
       <!-- Rec -->
-      <button id="recBtn" type="button" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer">
-        <span id="recBg" style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#1A2820">
+      <button id="recBtn" type="button" class="ctrl-btn">
+        <span id="recBg" class="ctrl-icon-bg">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4" fill="currentColor"></circle></svg>
         </span>
-        <span id="recLabel" style="font-size:12px;font-weight:700">Record</span>
+        <span id="recLabel" class="ctrl-label">Record</span>
       </button>
 
       <!-- Message -->
-      <button id="chatBtn" type="button" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer">
-        <span id="chatBg" style="position:relative;width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#1A2820">
+      <button id="chatBtn" type="button" class="ctrl-btn">
+        <span id="chatBg" class="ctrl-icon-bg" style="position:relative">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z"></path></svg>
           <span id="unread" class="hidden" style="position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:#16A34A;font-size:11px;font-weight:800;display:grid;place-items:center;color:#fff">0</span>
         </span>
-        <span style="font-size:12px;font-weight:700">Message</span>
+        <span class="ctrl-label">Message</span>
       </button>
 
       <!-- People -->
-      <button id="peopleBtn" type="button" style="width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer">
-        <span id="peopleBg" style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#1A2820">
+      <button id="peopleBtn" type="button" class="ctrl-btn">
+        <span id="peopleBg" class="ctrl-icon-bg">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"></circle><path d="M2 21a7 7 0 0 1 14 0M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"></path></svg>
         </span>
-        <span style="font-size:12px;font-weight:700">People</span>
+        <span class="ctrl-label">People</span>
       </button>
     </div>
 
     <!-- Right Leave Button -->
-    <div style="flex:1 1 140px;display:flex;justify-content:flex-end">
-      <button id="leaveBtn" type="button" style="height:48px;padding:0 22px;border:0;border-radius:14px;background:#DC2626;color:#fff;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:8px">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l-5-5 5-5M5 12h11M16 4h3a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-3"></path></svg>
-        Leave
+    <div class="leave-cluster">
+      <button id="leaveBtn" type="button" class="leave-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l-5-5 5-5M5 12h11M16 4h3a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-3"></path></svg>
+        <span class="leave-label">Leave</span>
       </button>
     </div>
   </footer>
@@ -384,7 +677,7 @@
 
 <!-- Leave Confirmation Modal -->
 <div id="leaveModal" class="hidden modal-overlay">
-  <div style="width:100%;max-width:380px;display:flex;flex-direction:column;gap:18px;padding:28px;border-radius:20px;background:#121D17;box-shadow:0 30px 80px rgba(0,0,0,0.5)">
+  <div style="width:90%;max-width:380px;display:flex;flex-direction:column;gap:18px;padding:24px;border-radius:20px;background:#121D17;box-shadow:0 30px 80px rgba(0,0,0,0.5)">
     <div style="display:flex;flex-direction:column;gap:6px">
       <h2 style="margin:0;font-size:22px;font-weight:800">Leave this room?</h2>
       <p id="leaveCopy" style="margin:0;font-size:14px;color:#A7BDB1;line-height:1.5">You're the host. End the room for everyone, or leave and let the others carry on.</p>
@@ -399,6 +692,6 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/core.js?v=15"></script>
-<script src="/js/call.js?v=15"></script>
+<script src="/js/call.js?v=1794142790377"></script>
 </body>
 </html>

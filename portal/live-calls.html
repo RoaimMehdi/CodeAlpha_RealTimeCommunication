@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -10,7 +10,7 @@
 <body>
 
   <!-- SIDEBAR -->
-  <aside class="portal-sidebar">
+  <aside class="portal-sidebar" id="portalSidebar">
     <a href="/" class="portal-brand">
       <img src="/assets/camknock-icon.png" width="36" height="36" alt="CamKnock" style="border-radius:8px;box-shadow:0 3px 10px rgba(14,122,75,0.4)">
       <div>
@@ -33,11 +33,15 @@
       <a href="/" style="font-size:12px;color:#4ADE80;font-weight:700;text-decoration:none">Back to CamKnock &rarr;</a>
     </div>
   </aside>
+  <div class="portal-sidebar-backdrop" onclick="document.getElementById('portalSidebar').classList.remove('open')"></div>
 
   <!-- MAIN -->
   <main class="portal-main">
     <header class="portal-header">
       <div style="display:flex;align-items:center;gap:12px">
+        <button class="mobile-menu-btn" onclick="document.getElementById('portalSidebar').classList.toggle('open')" aria-label="Toggle Navigation">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
         <h1 style="font-size:20px;font-weight:800;color:#fff">Active Live WebRTC Calls Monitor</h1>
         <span id="roleIndicator" class="role-badge role-admin">ADMIN PORTAL</span>
       </div>

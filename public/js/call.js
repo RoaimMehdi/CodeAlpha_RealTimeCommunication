@@ -27,8 +27,15 @@
     iceServers: [
       { urls: 'stun:stun.l.google.com:19302' },
       { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' },
+      { urls: 'stun:stun3.l.google.com:19302' },
+      { urls: 'stun:stun4.l.google.com:19302' },
+      { urls: 'stun:stun.cloudflare.com:3478' },
     ],
+    iceCandidatePoolSize: 10,
   };
+
+  const pendingCandidates = new Map();
 
   const pcs = new Map();
   const peers = new Map();
@@ -125,24 +132,47 @@
       }
     }
     const anySharing = sharing || !!remoteSharer;
+    const isMobile = window.innerWidth <= 768;
 
     if (anySharing || whiteboardOpen) {
-      $stage.style.gridTemplateColumns = 'minmax(0, 1fr) 260px';
-      $tiles.style.gridTemplateColumns = 'minmax(0, 1fr)';
-      $tiles.style.gridAutoRows = 'minmax(0, 1fr)';
+      if (isMobile) {
+        $stage.style.gridTemplateColumns = 'minmax(0, 1fr)';
+        $stage.style.gridTemplateRows = 'minmax(0, 2fr) minmax(110px, 1fr)';
+        $tiles.style.gridTemplateColumns = 'repeat(auto-fit, minmax(110px, 1fr))';
+        $tiles.style.gridAutoRows = 'minmax(100px, 1fr)';
+      } else {
+        $stage.style.gridTemplateColumns = 'minmax(0, 1fr) 260px';
+        $stage.style.gridTemplateRows = 'minmax(0, 1fr)';
+        $tiles.style.gridTemplateColumns = 'minmax(0, 1fr)';
+        $tiles.style.gridAutoRows = 'minmax(0, 1fr)';
+      }
     } else {
       $stage.style.gridTemplateColumns = 'minmax(0, 1fr)';
+      $stage.style.gridTemplateRows = 'minmax(0, 1fr)';
       $tiles.style.gridAutoRows = 'minmax(0, 1fr)';
 
-      if (totalTiles <= 1) {
-        $tiles.style.gridTemplateColumns = 'minmax(0, 1fr)';
-      } else if (totalTiles <= 4) {
-        $tiles.style.gridTemplateColumns = 'repeat(2, minmax(0, 1fr))';
+      if (window.innerWidth <= 600) {
+        if (totalTiles <= 1) {
+          $tiles.style.gridTemplateColumns = 'minmax(0, 1fr)';
+        } else if (totalTiles === 2) {
+          $tiles.style.gridTemplateColumns = 'minmax(0, 1fr)';
+        } else {
+          $tiles.style.gridTemplateColumns = 'repeat(2, minmax(0, 1fr))';
+        }
       } else {
-        $tiles.style.gridTemplateColumns = 'repeat(3, minmax(0, 1fr))';
+        if (totalTiles <= 1) {
+          $tiles.style.gridTemplateColumns = 'minmax(0, 1fr)';
+        } else if (totalTiles <= 4) {
+          $tiles.style.gridTemplateColumns = 'repeat(2, minmax(0, 1fr))';
+        } else {
+          $tiles.style.gridTemplateColumns = 'repeat(3, minmax(0, 1fr))';
+        }
       }
     }
   }
+
+  window.addEventListener('resize', updateLayout);
+  window.addEventListener('orientationchange', updateLayout);
 
   function paintChrome() {
     $('roomTitle').textContent = roomName || (userName() ? `${userName()}’s Room` : 'CamKnock');
@@ -188,8 +218,11 @@
       const remoteTile = document.getElementById('tile-' + remoteSharer.id);
       const remoteVideo = remoteTile ? remoteTile.querySelector('video') : null;
       const remoteStream = remoteSharer.stream || (remoteVideo ? remoteVideo.srcObject : null);
-      if (remoteStream && $shareVideo.srcObject !== remoteStream) {
-        $shareVideo.srcObject = remoteStream;
+      if (remoteStream) {
+        if ($shareVideo.srcObject !== remoteStream) {
+          $shareVideo.srcObject = remoteStream;
+        }
+        $shareVideo.play().catch(() => {});
       }
       $shareVideo.muted = false;
       $('shareUserLabel').textContent = `${remoteSharer.name || 'Participant'} is sharing their screen`;
@@ -284,6 +317,39 @@
     if ($selfVideo.srcObject !== localStream) $selfVideo.srcObject = localStream;
   }
 
+  function createSilentAudioTrack() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const dst = ctx.createMediaStreamDestination();
+      osc.connect(dst);
+      osc.start();
+      const track = dst.stream.getAudioTracks()[0];
+      track.enabled = false;
+      return track;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function createBlackVideoTrack(width = 640, height = 480) {
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#0a120e';
+      ctx.fillRect(0, 0, width, height);
+      const stream = canvas.captureStream(10);
+      const track = stream.getVideoTracks()[0];
+      track.enabled = false;
+      return track;
+    } catch (e) {
+      return null;
+    }
+  }
+
   async function ensureMedia() {
     if (localStream) {
       applyLocalTracks();
@@ -292,14 +358,34 @@
     }
     try {
       localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    } catch (err1) {
+      console.warn('getUserMedia audio+video failed, checking separate tracks:', err1.message);
+      let aTrack = null;
+      let vTrack = null;
+      try {
+        const aStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        aTrack = aStream.getAudioTracks()[0];
+      } catch (e) {
+        console.warn('Microphone permission/device error:', e.message);
+        aTrack = createSilentAudioTrack();
+      }
+      try {
+        const vStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        vTrack = vStream.getVideoTracks()[0];
+      } catch (e) {
+        console.warn('Camera permission/device error:', e.message);
+        vTrack = createBlackVideoTrack();
+      }
+      const tracks = [aTrack, vTrack].filter(Boolean);
+      localStream = new MediaStream(tracks);
+    }
+
+    if (localStream) {
       applyLocalTracks();
       watchSpeaking(localStream, (on) => {
         selfSpeaking = on;
         $('selfTile').classList.toggle('speaking', on && micOn);
       });
-    } catch (err) {
-      console.warn('Media permissions warning:', err.message);
-      $('camNote').textContent = 'Camera unavailable — check browser permissions';
     }
     paintChrome();
     return localStream;
@@ -347,14 +433,17 @@
         }
       } else if (newTrack) {
         const streamToSend = (sharing && shareStream) ? shareStream : localStream;
-        pc.addTrack(newTrack, streamToSend || new MediaStream([newTrack]));
         try {
-          const offer = await pc.createOffer();
-          await pc.setLocalDescription(offer);
-          socket.emit('signal', { to: peerId, data: { sdp: pc.localDescription } });
-        } catch (err) {
-          console.warn('Offer error on addTrack:', err.message);
-        }
+          pc.addTrack(newTrack, streamToSend || new MediaStream([newTrack]));
+        } catch (e) {}
+      }
+
+      try {
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        socket.emit('signal', { to: peerId, data: { sdp: pc.localDescription } });
+      } catch (err) {
+        console.warn('Renegotiation error on replaceVideo:', err.message);
       }
     }
   }
@@ -380,7 +469,7 @@
     const avColor = colors[Math.abs(peer.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % colors.length];
 
     el.innerHTML = `
-      <video autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none"></video>
+      <video autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video>
       <div data-ph style="position:absolute;inset:0;display:grid;place-items:center">
         <div data-av style="width:84px;height:84px;border-radius:50%;background:${avColor};color:#0A3D27;display:grid;place-items:center;font-size:28px;font-weight:800">${initials(peer.name)}</div>
       </div>
@@ -407,9 +496,16 @@
     el.querySelector('[data-hand]').classList.toggle('hidden', !state.hand);
 
     const video = el.querySelector('video');
-    const hasVideo = !!video.srcObject && (state.sharing || state.cam !== false);
-    video.style.display = hasVideo ? 'block' : 'none';
-    el.querySelector('[data-ph]').style.display = hasVideo ? 'none' : 'grid';
+    const vTracks = peer.stream ? peer.stream.getVideoTracks() : [];
+    const hasActiveVideo = vTracks.some((t) => t.enabled && t.readyState === 'live');
+    const shouldShowVideo = hasActiveVideo && (state.sharing || state.cam !== false);
+
+    video.style.display = shouldShowVideo ? 'block' : 'none';
+    el.querySelector('[data-ph]').style.display = shouldShowVideo ? 'none' : 'grid';
+
+    if (video.srcObject && video.paused) {
+      video.play().catch(() => {});
+    }
 
     el.classList.toggle('speaking', !!peer.speaking && state.mic !== false);
   }
@@ -418,6 +514,7 @@
     const pc = pcs.get(id);
     if (pc) pc.close();
     pcs.delete(id);
+    pendingCandidates.delete(id);
     peers.delete(id);
     const el = document.getElementById('tile-' + id);
     if (el) el.remove();
@@ -698,10 +795,13 @@
 
     const pc = new RTCPeerConnection(ICE);
     pcs.set(peer.id, pc);
+    pendingCandidates.set(peer.id, []);
 
     const streamToSend = sharing && shareStream ? shareStream : localStream;
     if (streamToSend) {
-      streamToSend.getTracks().forEach((track) => pc.addTrack(track, streamToSend));
+      streamToSend.getTracks().forEach((track) => {
+        try { pc.addTrack(track, streamToSend); } catch (e) {}
+      });
     }
 
     pc.onicecandidate = (event) => {
@@ -714,20 +814,44 @@
       const tile = peerTile(peer);
       const video = tile.querySelector('video');
       let stream = event.streams && event.streams[0];
-      if (!stream && event.track) {
+      if (!stream) {
         if (!peer.stream) peer.stream = new MediaStream();
         peer.stream.addTrack(event.track);
         stream = peer.stream;
-      }
-      if (stream) {
+      } else {
         peer.stream = stream;
-        if (video.srcObject !== stream) video.srcObject = stream;
-        watchSpeaking(stream, (speaking) => {
-          peer.speaking = speaking;
-          tile.classList.toggle('speaking', speaking && peer.state?.mic !== false);
-          paintPeople();
+      }
+
+      if (video.srcObject !== stream) {
+        video.srcObject = stream;
+      }
+      video.muted = false;
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn('Auto-play blocked, clicking tile will unmute:', err);
         });
       }
+
+      event.track.onunmute = () => {
+        paintPeer(peer);
+        paintChrome();
+      };
+
+      // If remote peer is sharing, update the screen share video immediately
+      if (peer.state && peer.state.sharing) {
+        if ($shareVideo.srcObject !== stream) {
+          $shareVideo.srcObject = stream;
+          $shareVideo.play().catch(() => {});
+        }
+      }
+
+      watchSpeaking(stream, (speaking) => {
+        peer.speaking = speaking;
+        tile.classList.toggle('speaking', speaking && peer.state?.mic !== false);
+        paintPeople();
+      });
+
       paintPeer(peer);
       paintChrome();
     };
@@ -735,6 +859,7 @@
     if (isInitiator) {
       pc.onnegotiationneeded = async () => {
         try {
+          if (pc.signalingState !== 'stable') return;
           const offer = await pc.createOffer();
           await pc.setLocalDescription(offer);
           socket.emit('signal', { to: peer.id, data: { sdp: pc.localDescription } });
@@ -748,7 +873,6 @@
   }
 
   async function onSignal({ from, name, data }) {
-    // Server sends: { from: socketId, name: peerName, data: {sdp/candidate} }
     const peer = peers.get(from);
     if (!peer) return;
 
@@ -757,12 +881,20 @@
     try {
       if (data.sdp) {
         await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+
+        // Flush any queued ICE candidates that arrived before remoteDescription
+        const queue = pendingCandidates.get(from) || [];
+        while (queue.length) {
+          const cand = queue.shift();
+          try { await pc.addIceCandidate(new RTCIceCandidate(cand)); } catch (e) {}
+        }
+
         if (data.sdp.type === 'offer') {
           const streamToSend = sharing && shareStream ? shareStream : localStream;
           if (streamToSend) {
             streamToSend.getTracks().forEach((track) => {
               if (!pc.getSenders().some((s) => s.track === track)) {
-                pc.addTrack(track, streamToSend);
+                try { pc.addTrack(track, streamToSend); } catch (e) {}
               }
             });
           }
@@ -771,7 +903,17 @@
           socket.emit('signal', { to: from, data: { sdp: pc.localDescription } });
         }
       } else if (data.candidate) {
-        await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+        if (!pc.remoteDescription || !pc.remoteDescription.type) {
+          const queue = pendingCandidates.get(from) || [];
+          queue.push(data.candidate);
+          pendingCandidates.set(from, queue);
+        } else {
+          try {
+            await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+          } catch (e) {
+            console.warn('AddIceCandidate error:', e.message);
+          }
+        }
       }
     } catch (err) {
       console.warn('Signaling error:', err.message);
@@ -798,7 +940,8 @@
 
     socket.on('peer-joined', (peer) => {
       peers.set(peer.id, peer);
-      ensurePc(peer, true);
+      // Existing peer waits for new peer to offer (isInitiator: false)
+      ensurePc(peer, false);
       paintPeer(peer);
       paintPeople();
       paintChrome();
@@ -858,8 +1001,17 @@
 
       (ack.peers || []).forEach((peer) => {
         peers.set(peer.id, peer);
-        ensurePc(peer, true);
+        // New peer is the initiator towards existing peers
+        const pc = ensurePc(peer, true);
         paintPeer(peer);
+        // Explicitly create and send offer immediately to ensure connection starts
+        pc.createOffer().then((offer) => {
+          return pc.setLocalDescription(offer);
+        }).then(() => {
+          socket.emit('signal', { to: peer.id, data: { sdp: pc.localDescription } });
+        }).catch((err) => {
+          console.warn('Initial offer failed:', err);
+        });
       });
 
       (ack.messages || []).forEach(addMessage);

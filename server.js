@@ -1,4 +1,4 @@
-'use strict';
+﻿'use strict';
 
 /**
  * CamKnock — backend
@@ -1338,6 +1338,12 @@ io.on('connection', (socket) => {
 });
 
 /* ------------------------------------------------------------------ */
+process.on('uncaughtException', (err) => {
+  console.error('[uncaughtException]', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[unhandledRejection]', reason);
+});
 /* Lifecycle                                                          */
 /* ------------------------------------------------------------------ */
 

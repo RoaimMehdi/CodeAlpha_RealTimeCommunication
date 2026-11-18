@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -117,6 +117,23 @@
     footer a { color: #4B5F55; font-weight: 600; margin: 0 10px; }
     footer a:hover { color: #0E7A4B; }
     .divider { border: none; border-top: 1px solid #DCE6E0; margin: 0; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 600px) {
+      .nav-wrap {
+        padding: 0 16px;
+        height: 56px;
+      }
+      .logo-text { font-size: 15px; }
+      .back-btn { padding: 0 12px; font-size: 12px; }
+      .hero-wrap { padding: 40px 16px 36px; }
+      .content-wrap { padding: 32px 16px 48px; }
+      .contact-card { padding: 20px 16px; }
+      .section-title { font-size: 16px; }
+      .section p, .section ul li { font-size: 14px; }
+      footer { padding: 24px 16px !important; }
+      footer > div { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+    }
   </style>
 </head>
 <body>

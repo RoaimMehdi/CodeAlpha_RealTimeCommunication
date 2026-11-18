@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -159,6 +159,30 @@
     }
     footer a { color: #4B5F55; font-weight: 600; margin: 0 10px; }
     footer a:hover { color: #0E7A4B; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 600px) {
+      .nav-wrap { padding: 0 16px; height: 56px; }
+      .back-btn { padding: 0 12px; font-size: 12px; }
+      .hero-wrap { padding: 40px 16px 36px; }
+      .hero-sub { font-size: 14px; }
+      .search-box { max-width: 100%; }
+      .main-wrap { padding: 32px 16px 48px; }
+      .topics-grid { grid-template-columns: 1fr; gap: 14px; margin-bottom: 36px; }
+      .topic-card { padding: 18px 16px; }
+      .faq-sec-title { font-size: 20px; }
+      .faq-q { padding: 14px 16px; font-size: 14px; }
+      .faq-a { padding: 0 16px 14px; font-size: 14px; }
+      .contact-banner { padding: 32px 16px; }
+      .contact-banner h2 { font-size: 20px; }
+      .contact-email-btn { font-size: 13px; padding: 10px 16px; }
+      footer { padding: 24px 16px !important; margin-top: 32px !important; }
+      footer > div { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+    }
+    @media (max-width: 400px) {
+      .hero-title { font-size: 24px !important; }
+      .contact-email-btn { width: 100% !important; justify-content: center !important; }
+    }
   </style>
 </head>
 <body>

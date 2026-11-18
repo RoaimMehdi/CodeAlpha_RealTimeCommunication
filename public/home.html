@@ -55,14 +55,132 @@
     .card-hover:hover {
       transform: translateY(-3px);
     }
-  </style>
+
+    /* Responsive Home Classes */
+    .home-shell {
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 12px;
+      background: #fff;
+      display: flex;
+    }
+    .home-inner-card {
+      flex: 1;
+      border-radius: 24px;
+      background: #F2F8F4;
+      display: flex;
+      flex-direction: column;
+      padding: 24px 28px;
+      gap: 24px;
+      min-width: 0;
+    }
+    .home-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .home-hero-title {
+      margin: 0;
+      font-size: clamp(28px, 6vw, 48px);
+      line-height: 1.08;
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      color: #0A3D27;
+    }
+    .home-hero-sub {
+      margin: 0;
+      font-size: clamp(14px, 3.5vw, 17px);
+      color: #4B5F55;
+    }
+    .home-cards-grid {
+      width: 100%;
+      max-width: 960px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+      gap: 20px;
+    }
+    .home-action-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+      padding: clamp(20px, 4vw, 36px);
+      border-radius: 22px;
+      min-height: 320px;
+    }
+    .home-card-title {
+      margin: 0;
+      font-size: clamp(22px, 4.5vw, 30px);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+    }
+    .home-calendar-card {
+      width: 100%;
+      max-width: 960px;
+      background: #fff;
+      border-radius: 22px;
+      padding: clamp(20px, 4vw, 32px);
+      box-shadow: 0 1px 2px rgba(10,61,39,0.06), 0 12px 32px rgba(10,61,39,0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .modal-box-home {
+      background: #fff;
+      border-radius: 22px;
+      padding: clamp(20px, 5vw, 32px);
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 24px 60px rgba(10,61,39,0.25);
+    }
+    .modal-grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .home-shell {
+        padding: 6px;
+      }
+      .home-inner-card {
+        padding: 16px 14px;
+        border-radius: 18px;
+        gap: 18px;
+      }
+      .home-cards-grid {
+        gap: 14px;
+      }
+      #clock {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .home-header {
+        gap: 10px;
+      }
+      .modal-grid-2col {
+        grid-template-columns: 1fr;
+      }
+      .home-action-card {
+        min-height: auto;
+      }
+      .sched-header-action {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+    </style>
 </head>
 <body>
-<div style="min-height:100vh;padding:12px;background:#fff;display:flex">
-  <div style="flex:1;border-radius:24px;background:#F2F8F4;display:flex;flex-direction:column;padding:20px 28px;gap:24px">
+<div class="home-shell">
+  <div class="home-inner-card">
     
     <!-- Header -->
-    <header style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <header class="home-header">
       <div style="display:flex;align-items:center;gap:11px">
         <img src="/assets/camknock-icon.png" width="38" height="38" alt="CamKnock" style="border-radius:10px;display:block;box-shadow:0 3px 10px rgba(14,122,75,0.2)">
         <div style="font-size:22px;font-weight:800;letter-spacing:-0.03em;color:#0A3D27;display:flex;align-items:center">
@@ -82,13 +200,13 @@
     <!-- Main Content -->
     <main class="anim-in" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:36px;padding:20px 0">
       <div style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
-        <h1 style="margin:0;font-size:48px;line-height:1.05;font-weight:800;letter-spacing:-0.035em;color:#0A3D27">Ready to meet?</h1>
-        <p style="margin:0;font-size:17px;color:#4B5F55">Start a new room or join one with a code.</p>
+        <h1 class="home-hero-title">Ready to meet?</h1>
+        <p class="home-hero-sub">Start a new room or join one with a code.</p>
       </div>
 
-      <div style="width:100%;max-width:960px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px">
+      <div class="home-cards-grid">
         <!-- Start a Room Card -->
-        <section class="card-hover" style="display:flex;flex-direction:column;justify-content:space-between;gap:28px;padding:36px;border-radius:24px;background:#0E7A4B;color:#fff;min-height:340px;box-shadow:0 16px 40px rgba(10,61,39,0.18)">
+        <section class="card-hover home-action-card" style="background:#0E7A4B;color:#fff;box-shadow:0 16px 40px rgba(10,61,39,0.18)">
           <div style="display:flex;flex-direction:column;gap:18px">
             <div style="width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.28);display:grid;place-items:center">
               <div style="position:relative;width:24px;height:17px;border-radius:4px;background:#fff">
@@ -96,7 +214,7 @@
               </div>
             </div>
             <div style="display:flex;flex-direction:column;gap:8px">
-              <h2 style="margin:0;font-size:30px;font-weight:800;letter-spacing:-0.025em">Start a Room</h2>
+              <h2 class="home-card-title">Start a Room</h2>
               <p style="margin:0;font-size:15px;line-height:1.5">Open a new room instantly and invite people with a link.</p>
             </div>
           </div>
@@ -120,7 +238,7 @@
         </section>
 
         <!-- Join a Room Card -->
-        <section class="card-hover" style="display:flex;flex-direction:column;justify-content:space-between;gap:28px;padding:36px;border-radius:24px;background:#fff;min-height:340px;box-shadow:0 1px 2px rgba(10,61,39,0.06),0 12px 32px rgba(10,61,39,0.08)">
+        <section class="card-hover home-action-card" style="background:#fff;box-shadow:0 1px 2px rgba(10,61,39,0.06),0 12px 32px rgba(10,61,39,0.08)">
           <div style="display:flex;flex-direction:column;gap:18px">
             <div style="width:56px;height:56px;border-radius:16px;background:#E6F4EC;display:grid;place-items:center">
               <div style="display:grid;grid-template-columns:repeat(2,10px);gap:4px">
@@ -131,7 +249,7 @@
               </div>
             </div>
             <div style="display:flex;flex-direction:column;gap:8px">
-              <h2 style="margin:0;font-size:30px;font-weight:800;letter-spacing:-0.025em;color:#0A3D27">Join a Room</h2>
+              <h2 class="home-card-title" style="color:#0A3D27">Join a Room</h2>
               <p style="margin:0;font-size:15px;line-height:1.5;color:#4B5F55">Enter the room code or link from your invite.</p>
             </div>
           </div>
@@ -145,16 +263,16 @@
       </div>
 
       <!-- Calendar & Scheduled Meetings Section -->
-      <section style="width:100%;max-width:960px;background:#fff;border-radius:24px;padding:32px;box-shadow:0 1px 2px rgba(10,61,39,0.06),0 12px 32px rgba(10,61,39,0.08);display:flex;flex-direction:column;gap:20px">
+      <section class="home-calendar-card">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div>
-            <h2 style="margin:0;font-size:24px;font-weight:800;color:#0A3D27;letter-spacing:-0.02em;display:flex;align-items:center;gap:10px">
+            <h2 style="margin:0;font-size:clamp(19px, 4.5vw, 24px);font-weight:800;color:#0A3D27;letter-spacing:-0.02em;display:flex;align-items:center;gap:10px">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0E7A4B" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
               Scheduled Calendar &amp; Upcoming Meetings
             </h2>
             <p style="margin:4px 0 0;font-size:14px;color:#4B5F55">View your booked sessions or schedule a new meeting with automated room generation.</p>
           </div>
-          <button id="openSchedBtn" type="button" style="height:44px;padding:0 18px;border:0;border-radius:12px;background:#0E7A4B;color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px">
+          <button id="openSchedBtn" class="sched-header-action" type="button" style="height:44px;padding:0 18px;border:0;border-radius:12px;background:#0E7A4B;color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Schedule Meeting
           </button>
@@ -167,15 +285,15 @@
     </main>
 
     <!-- Schedule Modal -->
-    <div id="homeSchedModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:999;padding:20px">
-      <div style="background:#fff;border-radius:24px;padding:32px;width:100%;max-width:480px;box-shadow:0 24px 60px rgba(10,61,39,0.25)">
+    <div id="homeSchedModal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:999;padding:16px">
+      <div class="modal-box-home">
         <h3 style="margin:0 0 16px;font-size:22px;font-weight:800;color:#0A3D27">Schedule a Meeting</h3>
         <form id="homeSchedForm" style="display:flex;flex-direction:column;gap:14px">
           <div>
             <label style="font-size:13px;font-weight:700;color:#0A3D27;display:block;margin-bottom:4px">Title</label>
             <input id="hSchedTitle" required placeholder="e.g. Design Critique" class="field" style="width:100%;height:46px;padding:0 14px;border:1.5px solid #DCE6E0;border-radius:10px;font-size:14px">
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="modal-grid-2col">
             <div>
               <label style="font-size:13px;font-weight:700;color:#0A3D27;display:block;margin-bottom:4px">Date</label>
               <input type="date" id="hSchedDate" required class="field" style="width:100%;height:46px;padding:0 14px;border:1.5px solid #DCE6E0;border-radius:10px;font-size:14px">
