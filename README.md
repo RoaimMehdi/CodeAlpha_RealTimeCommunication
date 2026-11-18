@@ -178,8 +178,8 @@ Compose starts the app on port 9000 and a MySQL 8 database, applying
 | Call connects but no video           | Both peers need a working STUN path; try another network       |
 | `Cannot join this room`              | Room code typo, room full, or server restarted mid-join        |
 
-## License
+## Demo Video
 
-Internal project. No license granted for redistribution.
-#   C o d e A l p h a _ R e a l T i m e C o m m u n i c a t i o n  
- 
+## Demo Video
+
+Watch the demo here: [CamKnock Demo](https://drive.google.com/file/d/1Q7Z-cLAns4Cbn0-cTQ2fTeeXM8P6enUF/view?usp=drive_link)
